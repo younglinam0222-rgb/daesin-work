@@ -5,7 +5,7 @@
   <title>대신전기인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Supabase JS (백엔드 없이 폼 저장용) -->
+  <!-- Supabase JS -->
   <script src="https://unpkg.com/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
 
   <style>
@@ -14,6 +14,7 @@
       font-family:'Noto Sans KR',sans-serif;
       background:#020617;
       color:#e5e7eb;
+      line-height:1.5;
     }
     a{text-decoration:none;color:inherit;}
 
@@ -23,13 +24,11 @@
       --bg:#020617;
       --panel:#0f172a;
       --border:#1f2937;
-      --green:#22c55e;
-      --yellow:#facc15;
     }
 
     header{
       position:sticky;top:0;z-index:50;
-      background:rgba(15,23,42,0.95);
+      background:rgba(15,23,42,0.97);
       border-bottom:1px solid #1f2937;
     }
     .nav{
@@ -40,12 +39,13 @@
     }
     .logo{font-size:20px;font-weight:800;color:var(--primary);}
     .nav-menu{display:flex;gap:14px;font-size:14px;}
-    .nav-menu a{padding:4px 6px;border-radius:999px;}
+    .nav-menu a{padding:4px 8px;border-radius:999px;}
     .nav-menu a:hover{background:#1d293b;}
     .nav-call{
-      background:var(--green);color:#022c22;
+      background:#22c55e;color:#022c22;
       padding:6px 12px;border-radius:999px;
       font-weight:700;
+      font-size:14px;
     }
 
     .section{padding:40px 16px;}
@@ -63,8 +63,8 @@
     .hero-title{
       font-size:28px;font-weight:800;margin-bottom:10px;
     }
-    .hero-title strong{color:var(--yellow);}
-    .hero-text{font-size:15px;color:#e5e7eb;margin-bottom:14px;line-height:1.7;}
+    .hero-title strong{color:#facc15;}
+    .hero-text{font-size:15px;color:#e5e7eb;margin-bottom:14px;}
     .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
     .btn{
       display:inline-flex;align-items:center;justify-content:center;
@@ -72,8 +72,11 @@
       font-size:14px;font-weight:700;cursor:pointer;
       border:1px solid transparent;
     }
-    .btn-call{background:var(--green);color:#022c22;border-color:#16a34a;}
-    .btn-kakao{background:var(--yellow);color:#1f2937;border-color:#eab308;}
+    .btn-call{background:#22c55e;color:#022c22;border-color:#16a34a;}
+    .btn-kakao{background:#facc15;color:#1f2937;border-color:#eab308;}
+    .btn-call:hover{background:#16a34a;}
+    .btn-kakao:hover{background:#eab308;}
+
     .hero-card{
       background:rgba(15,23,42,0.9);
       border-radius:18px;padding:18px;
@@ -83,9 +86,10 @@
     .hero-row{margin-bottom:8px;}
     .hero-label{font-size:11px;color:#9ca3af;}
     .hero-value{font-weight:700;}
+    img.qr{width:150px;border-radius:12px;margin-top:8px;}
 
     .title{font-size:22px;font-weight:800;margin-bottom:6px;}
-    .sub{font-size:13px;color:#9ca3af;margin-bottom:18px;line-height:1.7;}
+    .sub{font-size:13px;color:#9ca3af;margin-bottom:18px;}
 
     .two-grid{
       display:grid;gap:18px;
@@ -96,22 +100,63 @@
       border-radius:16px;
       border:1px solid var(--border);
       padding:18px;
-      font-size:15px;
+      font-size:14px;
     }
     .panel h3{font-size:18px;margin-bottom:8px;}
     .panel ul{margin-left:16px;margin-top:4px;}
     .panel li{margin-bottom:4px;}
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px 16px;
+      margin-top:10px;
+    }
+    .form-row-full{
+      grid-column:1 / -1;
+    }
+    label{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+      color:#e5e7eb;
+    }
+    input, select, textarea{
+      width:100%;
+      padding:9px 10px;
+      border-radius:8px;
+      border:1px solid #374151;
+      background:#020617;
+      color:#e5e7eb;
+      font-size:15px;
+    }
+    textarea{min-height:90px;resize:vertical;}
 
     .btn-full{
       display:block;text-align:center;
       margin-top:16px;
       background:var(--primary);
       border-radius:999px;
-      padding:10px 0;
+      padding:11px 0;
       font-weight:700;
+      font-size:15px;
       cursor:pointer;
+      border:none;
+      width:100%;
     }
     .btn-full:hover{background:var(--primary-dark);}
+
+    .notice{
+      margin-top:10px;
+      font-size:13px;
+      color:#9ca3af;
+      line-height:1.4;
+    }
+
+    .status-msg{
+      margin-top:8px;
+      font-size:13px;
+    }
 
     footer{
       padding:18px 16px;
@@ -120,56 +165,12 @@
       color:#9ca3af;text-align:center;
     }
 
-    img.qr{width:150px;border-radius:12px;margin-top:8px;}
-
-    /* 모달 공통 */
-    .modal-backdrop{
-      position:fixed;inset:0;
-      background:rgba(15,23,42,0.8);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:100;
-    }
-    .modal{
-      background:#020617;
-      border-radius:16px;
-      border:1px solid #1f2937;
-      max-width:480px;width:90%;
-      padding:20px;
-      box-shadow:0 24px 60px rgba(0,0,0,0.6);
-      font-size:14px;
-    }
-    .modal h2{font-size:20px;margin-bottom:8px;}
-    .modal p{font-size:13px;color:#9ca3af;margin-bottom:10px;}
-    .field{margin-bottom:10px;}
-    .field label{display:block;font-size:13px;margin-bottom:3px;}
-    .field input,.field textarea,.field select{
-      width:100%;padding:8px 10px;
-      border-radius:8px;border:1px solid #1f2937;
-      background:#020617;color:#e5e7eb;
-      font-size:14px;
-    }
-    .field textarea{min-height:80px;resize:vertical;}
-    .modal-actions{
-      margin-top:12px;display:flex;justify-content:flex-end;gap:8px;
-    }
-    .btn-sm{
-      padding:8px 14px;border-radius:999px;border:none;
-      font-size:13px;font-weight:700;cursor:pointer;
-    }
-    .btn-cancel{background:#111827;color:#e5e7eb;}
-    .btn-submit{background:var(--green);color:#022c22;}
-
-    .notice{
-      margin-top:6px;font-size:12px;color:#9ca3af;line-height:1.6;
-    }
-
     @media(max-width:768px){
       .hero-grid,.two-grid{grid-template-columns:minmax(0,1fr);}
       .hero-title{font-size:22px;}
       .nav-menu{gap:10px;font-size:13px;}
-      .nav-call{display:none;} /* 상단 버튼 대신 배너 버튼 사용 */
+      .nav-call{display:none;}
+      .form-grid{grid-template-columns:minmax(0,1fr);}
     }
   </style>
 </head>
@@ -202,13 +203,13 @@
         <div class="hero-actions">
           <a href="tel:0328876293" class="btn btn-call">📞 바로 전화하기</a>
           <button type="button" class="btn btn-kakao"
-                  onclick="alert('카카오톡 QR코드를 카메라로 비추거나\nID 검색에서 \"daesin8253\"을 입력해 주세요.')">
+            onclick="alert('카카오톡 앱에서 ID 검색 → daesin8253 를 입력해 주세요.')">
             💬 카카오톡 문의
           </button>
         </div>
-        <p style="font-size:12px;color:#cbd5e1;line-height:1.6;">
-          · 50~60대 사장님들도 보시기 편하도록 글자 크기를 키웠습니다.<br>
-          · 급한 건은 전화가 가장 빠릅니다.
+        <p style="font-size:12px;color:#cbd5e1;">
+          * 50~60대 사장님들도 보시기 편하도록 글자 크기와 대비를 키웠습니다.<br>
+          * 급한 건은 전화가 가장 빠릅니다.
         </p>
       </div>
 
@@ -229,7 +230,7 @@
         </div>
         <div class="hero-row">
           <div class="hero-label">주소</div>
-          <div class="hero-value">인천광역시 미추홀구 경인로1 3층 301호</div>
+          <div class="hero-value">인천광역시 미추홀구 경인로 1, 3층 301호</div>
         </div>
         <div class="hero-row">
           <div class="hero-label">사업자등록번호</div>
@@ -241,8 +242,7 @@
         </div>
         <div class="hero-row">
           <div class="hero-label">카카오톡 QR</div>
-          <!-- kakao_qr.jpg 를 index.html과 같은 폴더에 두기 -->
-          <img src="kakao_qr.jpg" alt="카카오톡 QR" class="qr">
+          <img src="./kakao_qr.jpg" alt="카카오톡 QR" class="qr">
         </div>
       </div>
     </div>
@@ -275,30 +275,117 @@
     </div>
   </section>
 
-  <!-- 채용 섹션 -->
+  <!-- 전기 인력 채용 지원 -->
   <section class="section" id="recruit">
     <div class="inner">
       <h2 class="title">전기 인력 채용 지원</h2>
       <p class="sub">
-        간단히 작성해 주시면 담당자가 확인 후 바로 전화드립니다.<br>
-        신분증 · 건설기초안전교육 이수증 · 통장사본 등은
-        본인 확인 절차 후 별도 안내드립니다. 홈페이지에서는 민감정보를 직접 받지 않습니다.
+        간단히 작성해 주시면 담당자가 확인 후 바로 전화드립니다.
       </p>
+
       <div class="panel">
-        <p>아래 버튼을 눌러 지원서를 작성해 주세요.</p>
-        <button class="btn-full" type="button" onclick="showModal('recruit')">지원서 작성하기</button>
+        <form id="recruitForm">
+          <div class="form-grid">
+            <div>
+              <label for="region">지역</label>
+              <input id="region" name="region" placeholder="예) 인천, 부천, 김포 등">
+            </div>
+            <div>
+              <label for="age">나이</label>
+              <input id="age" name="age" placeholder="예) 45세">
+            </div>
+            <div>
+              <label for="career">전기공 경력</label>
+              <input id="career" name="career" placeholder="예) 경력 10년, 초보, 조공 등">
+            </div>
+            <div>
+              <label for="specialty">주특기</label>
+              <input id="specialty" name="specialty" placeholder="예) 배관, 트레이, 동력, 통신 등">
+            </div>
+            <div>
+              <label for="car_own">자차 여부</label>
+              <select id="car_own" name="car_own">
+                <option value="">선택하세요</option>
+                <option value="있음">있음</option>
+                <option value="없음">없음</option>
+              </select>
+            </div>
+            <div>
+              <label for="phone">연락처</label>
+              <input id="phone" name="phone" placeholder="예) 010-0000-0000">
+            </div>
+            <div class="form-row-full">
+              <label for="memo">기타 메모</label>
+              <textarea id="memo" name="memo" placeholder="희망 단가, 가능 지역, 근무 가능 요일 등 자유롭게 적어주세요."></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-full" id="recruitSubmit">지원서 보내기</button>
+          <div id="recruitStatus" class="status-msg"></div>
+
+          <p class="notice">
+            ※ 서류 제출 안내<br>
+            지원서 확인 후 담당자가 개별 연락드리며,<br>
+            신분증 · 건설기초안전교육 이수증 · 통장사본 등은
+            본인 확인 절차 후 별도로 안내드립니다.<br>
+            홈페이지에서는 어떠한 민감정보도 수집하지 않습니다.
+          </p>
+        </form>
       </div>
     </div>
   </section>
 
-  <!-- 협업 섹션 -->
+  <!-- 협업 · 제휴 문의 -->
   <section class="section" id="partner">
     <div class="inner">
       <h2 class="title">협업 · 제휴 문의</h2>
-      <p class="sub">전기공사 도급·하도급, 장기 파견, 대규모 프로젝트 협업은 아래 버튼을 눌러 문의해 주세요.</p>
+      <p class="sub">
+        전기공사 도급·하도급, 장기 파견, 대규모 프로젝트 협업은 아래 내용을 남겨 주시면
+        담당자가 직접 전화드립니다.
+      </p>
+
       <div class="panel">
-        <p>간단한 현장 정보와 연락처를 남겨주시면 담당자가 개별 연락드립니다.</p>
-        <button class="btn-full" type="button" onclick="showModal('partner')">협업 문의 작성하기</button>
+        <form id="partnerForm">
+          <div class="form-grid">
+            <div>
+              <label for="p_type">협업 분야</label>
+              <select id="p_type" name="type">
+                <option value="">선택하세요</option>
+                <option value="전기공사">전기공사</option>
+                <option value="장기파견">장기 파견</option>
+                <option value="철거·인테리어">철거·인테리어</option>
+                <option value="청소·기타">청소 / 기타</option>
+              </select>
+            </div>
+            <div>
+              <label for="p_company">회사명</label>
+              <input id="p_company" name="company" placeholder="예) ㈜○○전기">
+            </div>
+            <div>
+              <label for="p_manager">담당자명</label>
+              <input id="p_manager" name="manager" placeholder="예) 홍길동 소장">
+            </div>
+            <div>
+              <label for="p_phone">연락처</label>
+              <input id="p_phone" name="phone" placeholder="예) 010-0000-0000">
+            </div>
+            <div>
+              <label for="p_email">이메일</label>
+              <input id="p_email" name="email" placeholder="필수는 아니지만 있으면 좋습니다.">
+            </div>
+            <div>
+              <label for="p_schedule">희망 일정</label>
+              <input id="p_schedule" name="schedule" placeholder="예) 3월 둘째주부터 2개월 등">
+            </div>
+            <div class="form-row-full">
+              <label for="p_message">상세 내용</label>
+              <textarea id="p_message" name="message" placeholder="현장 위치, 공사 규모, 필요 인원/기간 등을 적어 주세요."></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-full" id="partnerSubmit">협업 문의 보내기</button>
+          <div id="partnerStatus" class="status-msg"></div>
+        </form>
       </div>
     </div>
   </section>
@@ -308,206 +395,86 @@
   © 대신전기인력. All Rights Reserved.
 </footer>
 
-<!-- 채용 모달 -->
-<div id="modal-recruit" class="modal-backdrop">
-  <div class="modal">
-    <h2>전기 인력 채용 지원</h2>
-    <p>필수 항목만 간단히 적어 주시면 담당자가 전화드립니다.</p>
-    <form onsubmit="submitRecruit(event)">
-      <div class="field">
-        <label>지역</label>
-        <input id="r-region" required placeholder="예) 인천 미추홀구">
-      </div>
-      <div class="field">
-        <label>나이</label>
-        <input id="r-age" required placeholder="예) 40대 초반">
-      </div>
-      <div class="field">
-        <label>전기공 경력</label>
-        <input id="r-career" required placeholder="예) 10년 / 아파트 배선 위주">
-      </div>
-      <div class="field">
-        <label>주특기</label>
-        <input id="r-specialty" placeholder="예) 트레이, 배관, 마감 조명 등">
-      </div>
-      <div class="field">
-        <label>자차 여부</label>
-        <select id="r-car">
-          <option value="">선택해 주세요</option>
-          <option value="자차 있음">자차 있음</option>
-          <option value="자차 없음">자차 없음</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>연락처</label>
-        <input id="r-phone" required placeholder="010-0000-0000">
-      </div>
-      <div class="field">
-        <label>기타 메모</label>
-        <textarea id="r-memo" placeholder="원하는 근무지역, 희망 단가, 근무 가능 요일 등"></textarea>
-      </div>
-      <p class="notice">
-        ※ 지원서 확인 후 담당자가 개별 연락을 드립니다. <br>
-        ※ 신분증, 건설기초안전교육 이수증, 통장사본 등은
-        본인 확인 절차 후 별도 안내드립니다.
-      </p>
-      <div class="modal-actions">
-        <button type="button" class="btn-sm btn-cancel" onclick="hideModal('recruit')">닫기</button>
-        <button type="submit" class="btn-sm btn-submit" id="r-submit">지원서 보내기</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- 협업 모달 -->
-<div id="modal-partner" class="modal-backdrop">
-  <div class="modal">
-    <h2>협업 · 제휴 문의</h2>
-    <p>현장 위치와 공정, 필요 인원 수 정도만 알려주셔도 됩니다.</p>
-    <form onsubmit="submitPartner(event)">
-      <div class="field">
-        <label>협업 분야</label>
-        <select id="p-type" required>
-          <option value="">선택해 주세요</option>
-          <option value="전기공사 도급/하도급">전기공사 도급/하도급</option>
-          <option value="전기 인력 장기 파견">전기 인력 장기 파견</option>
-          <option value="단기/스팟 인력 지원">단기/스팟 인력 지원</option>
-          <option value="건설/인테리어 협업">건설/인테리어 협업</option>
-          <option value="기타 제휴">기타 제휴</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>회사명</label>
-        <input id="p-company" required placeholder="예) ㈜OO전기">
-      </div>
-      <div class="field">
-        <label>담당자명</label>
-        <input id="p-manager" required placeholder="성함">
-      </div>
-      <div class="field">
-        <label>연락처</label>
-        <input id="p-phone" required placeholder="010-0000-0000">
-      </div>
-      <div class="field">
-        <label>이메일 (선택)</label>
-        <input id="p-email" type="email" placeholder="answer@example.com">
-      </div>
-      <div class="field">
-        <label>희망 일정 (선택)</label>
-        <input id="p-schedule" placeholder="예) 3월 말 ~ 4월 초">
-      </div>
-      <div class="field">
-        <label>상세 내용</label>
-        <textarea id="p-message" required
-          placeholder="현장 위치, 공정 내용, 필요 인원 수, 기간 등을 적어주시면 보다 정확한 상담이 가능합니다."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-sm btn-cancel" onclick="hideModal('partner')">닫기</button>
-        <button type="submit" class="btn-sm btn-submit" id="p-submit">협업 문의 보내기</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <script>
-  /* ============= 1) 모달 열고 닫기 ============= */
-  function showModal(kind){
-    document.getElementById("modal-" + kind).style.display = "flex";
-  }
-  function hideModal(kind){
-    document.getElementById("modal-" + kind).style.display = "none";
-  }
+  // 1) 여기 두 줄만 네 프로젝트 값으로 바꾸면 됨
+  const SUPABASE_URL = 'https://xovvbkcngfcndhkhwyqd.supabase.co'; // Project URL
+  const SUPABASE_ANON_KEY = 'sb_publishable_O_RB3eRmGYDRZfwifbw0CQ_izEVLwGJ';  // anon public
 
-  /* ============= 2) Supabase 설정 ============= */
-  // ⬇⬇⬇ 여기 두 줄만 네 supabase 값으로 바꿔줘 ⬇⬇⬇
-  const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-  const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
-  // ⬆⬆⬆ 이 부분 수정 안 하면 실제 저장은 안 하고 안내만 띄움
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let supa = null;
-  if (SUPABASE_URL.startsWith("https://YOUR-") ||
-      SUPABASE_ANON_KEY === "YOUR_PUBLIC_ANON_KEY") {
-    console.warn("Supabase 설정이 아직 안되었습니다.");
-  } else {
-    supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // 공통: 버튼 상태 바꾸기
+  function setButtonState(button, text, disabled){
+    button.textContent = text;
+    button.disabled = disabled;
+    button.style.opacity = disabled ? 0.6 : 1;
   }
 
-  function ensureSupabase(){
-    if (!supa){
-      alert("문의/지원 내용을 서버에 저장하려면\n먼저 Supabase 프로젝트 URL과 키를 설정해 주세요.");
-      return false;
-    }
-    return true;
-  }
-
-  /* ============= 3) 채용 지원 전송 ============= */
-  async function submitRecruit(e){
+  // ▶ 전기 인력 채용 지원 폼
+  document.getElementById('recruitForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!ensureSupabase()) return;
+    const btn = document.getElementById('recruitSubmit');
+    const statusEl = document.getElementById('recruitStatus');
+    setButtonState(btn, '전송 중입니다...', true);
+    statusEl.textContent = '';
 
-    const btn = document.getElementById("r-submit");
-    btn.disabled = true;
-    btn.textContent = "전송 중...";
-
-    const data = {
-      region: document.getElementById("r-region").value.trim(),
-      age: document.getElementById("r-age").value.trim(),
-      career: document.getElementById("r-career").value.trim(),
-      specialty: document.getElementById("r-specialty").value.trim(),
-      car_own: document.getElementById("r-car").value,
-      phone: document.getElementById("r-phone").value.trim(),
-      memo: document.getElementById("r-memo").value.trim()
+    const form = e.target;
+    const payload = {
+      region: form.region.value.trim(),
+      age: form.age.value.trim(),
+      career: form.career.value.trim(),
+      specialty: form.specialty.value.trim(),
+      car_own: form.car_own.value,
+      phone: form.phone.value.trim(),
+      memo: form.memo.value.trim()
     };
 
-    try{
-      const { error } = await supa.from("recruit_applications").insert(data);
-      if (error) throw error;
-      alert("지원서가 정상적으로 접수되었습니다.\n담당자가 확인 후 연락드리겠습니다.");
-      hideModal("recruit");
-    }catch(err){
-      console.error(err);
-      alert("전송 중 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.");
-    }finally{
-      btn.disabled = false;
-      btn.textContent = "지원서 보내기";
+    const { error } = await sb.from('recruit_applications').insert([payload]);
+
+    if(error){
+      statusEl.style.color = '#f97373';
+      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      console.error(error);
+    }else{
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
+      form.reset();
     }
-  }
+    setButtonState(btn, '지원서 보내기', false);
+  });
 
-  /* ============= 4) 협업 문의 전송 ============= */
-  async function submitPartner(e){
+  // ▶ 협업 · 제휴 문의 폼
+  document.getElementById('partnerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!ensureSupabase()) return;
+    const btn = document.getElementById('partnerSubmit');
+    const statusEl = document.getElementById('partnerStatus');
+    setButtonState(btn, '전송 중입니다...', true);
+    statusEl.textContent = '';
 
-    const btn = document.getElementById("p-submit");
-    btn.disabled = true;
-    btn.textContent = "전송 중...";
-
-    const data = {
-      type: document.getElementById("p-type").value,
-      company: document.getElementById("p-company").value.trim(),
-      manager: document.getElementById("p-manager").value.trim(),
-      phone: document.getElementById("p-phone").value.trim(),
-      email: document.getElementById("p-email").value.trim(),
-      schedule: document.getElementById("p-schedule").value.trim(),
-      message: document.getElementById("p-message").value.trim()
+    const form = e.target;
+    const payload = {
+      type: form.type.value,
+      company: form.company.value.trim(),
+      manager: form.manager.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      schedule: form.schedule.value.trim(),
+      message: form.message.value.trim()
     };
 
-    try{
-      const { error } = await supa.from("partner_inquiries").insert(data);
-      if (error) throw error;
-      alert("협업 문의가 정상적으로 접수되었습니다.\n담당자가 확인 후 연락드리겠습니다.");
-      hideModal("partner");
-    }catch(err){
-      console.error(err);
-      alert("전송 중 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.");
-    }finally{
-      btn.disabled = false;
-      btn.textContent = "협업 문의 보내기";
+    const { error } = await sb.from('partner_inquiries').insert([payload]);
+
+    if(error){
+      statusEl.style.color = '#f97373';
+      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      console.error(error);
+    }else{
+      statusEl.style.color = '#4ade80';
+      statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
+      form.reset();
     }
-  }
+    setButtonState(btn, '협업 문의 보내기', false);
+  });
 </script>
 
 </body>
 </html>
-
-
