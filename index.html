@@ -5,6 +5,9 @@
   <title>대신전기인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
+
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
@@ -391,21 +394,12 @@
   © 대신전기인력. All Rights Reserved.
 </footer>
 
-<!-- Supabase JS (맨 아래) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
-
 <script>
-(function(){
-  if (!window.supabase) {
-    alert("Supabase 라이브러리를 불러오지 못했습니다.");
-    return;
-  }
-
-  // 네 프로젝트 값
+  // 1) Supabase 프로젝트 설정
   const SUPABASE_URL = "https://xovvbkcngfcndhkhwyqd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_O_RB3eRmGYDRZfwifbw0CQ_izEVLwGJ";
 
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function setButtonState(button, text, disabled){
     button.textContent = text;
@@ -413,84 +407,101 @@
     button.style.opacity = disabled ? 0.6 : 1;
   }
 
-  // ▶ 전기 인력 채용 폼
-  const recruitForm = document.getElementById('recruitForm');
-  recruitForm.addEventListener('submit', async (e)=>{
+  // 전기 인력 채용 지원
+  document.getElementById('recruitForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const btn = document.getElementById('recruitSubmit');
     const statusEl = document.getElementById('recruitStatus');
     setButtonState(btn, '전송 중입니다...', true);
     statusEl.textContent = '';
 
-    const f = e.target;
+    const form = e.target;
     const payload = {
-      region: f.region.value.trim(),
-      age: f.age.value.trim(),
-      career: f.career.value.trim(),
-      specialty: f.specialty.value.trim(),
-      car_own: f.car_own.value,
-      phone: f.phone.value.trim(),
-      memo: f.memo.value.trim()
+      region: form.region.value.trim(),
+      age: form.age.value.trim(),
+      career: form.career.value.trim(),
+      specialty: form.specialty.value.trim(),
+      car_own: form.car_own.value,
+      phone: form.phone.value.trim(),
+      memo: form.memo.value.trim()
     };
 
-    const { error } = await sb.from('recruit_applications').insert([payload]);
+    console.log('[recruit] payload:', payload);
 
-    if (error) {
-      alert(
-        "지원서 저장 중 오류가 발생했습니다.\n\n" +
-        "code: " + (error.code || "없음") + "\n" +
-        "message: " + (error.message || "메시지 없음") +
-        (error.details ? "\n\ndetails: " + error.details : "")
-      );
-      console.error(error);
+    try {
+      const { data, error } = await sb
+        .from('recruit_applications')
+        .insert([payload]);
+
+      console.log('[recruit] data:', data, 'error:', error);
+
+      if (error) {
+        alert('Supabase 저장 중 오류가 발생했습니다.\n\nmessage: ' +
+          error.message + '\n\nstatus: ' + error.status);
+        statusEl.style.color = '#f97373';
+        statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      } else {
+        statusEl.style.color = '#4ade80';
+        statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
+        form.reset();
+      }
+    } catch (err) {
+      console.error('[recruit] exception:', err);
+      alert('Supabase 저장 중 오류가 발생했습니다.\n\n(details: ' + err + ')');
+      statusEl.style.color = '#f97373';
+      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+    } finally {
       setButtonState(btn, '지원서 보내기', false);
-      return;
     }
-
-    // 성공 시 thank you 페이지로 이동
-    window.location.href = "thanks.html";
   });
 
-  // ▶ 협업 · 제휴 문의 폼
-  const partnerForm = document.getElementById('partnerForm');
-  partnerForm.addEventListener('submit', async (e)=>{
+  // 협업 문의
+  document.getElementById('partnerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const btn = document.getElementById('partnerSubmit');
     const statusEl = document.getElementById('partnerStatus');
     setButtonState(btn, '전송 중입니다...', true);
     statusEl.textContent = '';
 
-    const f = e.target;
+    const form = e.target;
     const payload = {
-      type: f.type.value,
-      company: f.company.value.trim(),
-      manager: f.manager.value.trim(),
-      phone: f.phone.value.trim(),
-      email: f.email.value.trim(),
-      schedule: f.schedule.value.trim(),
-      message: f.message.value.trim()
+      type: form.type.value,
+      company: form.company.value.trim(),
+      manager: form.manager.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      schedule: form.schedule.value.trim(),
+      message: form.message.value.trim()
     };
 
-    const { error } = await sb.from('partner_inquiries').insert([payload]);
+    console.log('[partner] payload:', payload);
 
-    if (error) {
-      alert(
-        "협업 문의 저장 중 오류가 발생했습니다.\n\n" +
-        "code: " + (error.code || "없음") + "\n" +
-        "message: " + (error.message || "메시지 없음") +
-        (error.details ? "\n\ndetails: " + error.details : "")
-      );
-      console.error(error);
+    try {
+      const { data, error } = await sb
+        .from('partner_inquiries')
+        .insert([payload]);
+
+      console.log('[partner] data:', data, 'error:', error);
+
+      if (error) {
+        alert('Supabase 저장 중 오류가 발생했습니다.\n\nmessage: ' +
+          error.message + '\n\nstatus: ' + error.status);
+        statusEl.style.color = '#f97373';
+        statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+      } else {
+        statusEl.style.color = '#4ade80';
+        statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
+        form.reset();
+      }
+    } catch (err) {
+      console.error('[partner] exception:', err);
+      alert('Supabase 저장 중 오류가 발생했습니다.\n\n(details: ' + err + ')');
+      statusEl.style.color = '#f97373';
+      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
+    } finally {
       setButtonState(btn, '협업 문의 보내기', false);
-      return;
     }
-
-    window.location.href = "thanks.html";
   });
-
-})();
 </script>
 
 </body>
