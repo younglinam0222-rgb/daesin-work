@@ -5,9 +5,6 @@
   <title>대신전기인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Supabase JS (jsDelivr CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
-
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
@@ -394,15 +391,25 @@
   © 대신전기인력. All Rights Reserved.
 </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("🔧 JS Loaded");
+<!-- Supabase JS 를 페이지 맨 아래에서 불러오기 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
 
-  // ★ 여기는 네 Supabase 값 그대로 사용
+<script>
+(function(){
+  console.log("🔧 스크립트 시작");
+
+  if (!window.supabase) {
+    alert("Supabase 라이브러리를 불러오지 못했습니다.\n인터넷 연결이나 광고차단 설정을 확인해 주세요.");
+    console.error("supabase is undefined");
+    return;
+  }
+
+  // ▶ 여기는 네 프로젝트 값
   const SUPABASE_URL = "https://xovvbkcngfcndhkhwyqd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_O_RB3eRmGYDRZfwifbw0CQ_izEVLwGJ";
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log("✅ Supabase client 생성 완료");
 
   function setButtonState(button, text, disabled){
     button.textContent = text;
@@ -410,10 +417,11 @@ document.addEventListener('DOMContentLoaded', () => {
     button.style.opacity = disabled ? 0.6 : 1;
   }
 
-  // ▶ 전기 인력 채용 지원 폼
+  // 전기 인력 채용 폼
   const recruitForm = document.getElementById('recruitForm');
-  recruitForm.addEventListener('submit', async (e) => {
+  recruitForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    alert("지원서 폼 전송 시작 (테스트 알림)\n→ 이 알림이 보이면 이벤트 연결은 정상입니다.");
     console.log("📨 recruitForm submit");
 
     const btn = document.getElementById('recruitSubmit');
@@ -421,34 +429,37 @@ document.addEventListener('DOMContentLoaded', () => {
     setButtonState(btn, '전송 중입니다...', true);
     statusEl.textContent = '';
 
-    const form = e.target;
+    const f = e.target;
     const payload = {
-      region: form.region.value.trim(),
-      age: form.age.value.trim(),
-      career: form.career.value.trim(),
-      specialty: form.specialty.value.trim(),
-      car_own: form.car_own.value,
-      phone: form.phone.value.trim(),
-      memo: form.memo.value.trim()
+      region: f.region.value.trim(),
+      age: f.age.value.trim(),
+      career: f.career.value.trim(),
+      specialty: f.specialty.value.trim(),
+      car_own: f.car_own.value,
+      phone: f.phone.value.trim(),
+      memo: f.memo.value.trim()
     };
+
+    console.log("recruit payload:", payload);
 
     const { error } = await sb.from('recruit_applications').insert([payload]);
 
-    if(error){
+    if (error) {
       console.error("❌ recruit error:", error);
-      alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      alert("Supabase 저장 중 오류가 발생했습니다.\n콘솔 로그를 확인해 주세요.");
       setButtonState(btn, '지원서 보내기', false);
       return;
     }
 
-    // 성공시 thanks.html 로 이동
-    window.location.href = 'thanks.html';
+    // 성공 시 thanks.html 로 이동
+    window.location.href = "thanks.html";
   });
 
-  // ▶ 협업 · 제휴 문의 폼
+  // 협업 문의 폼
   const partnerForm = document.getElementById('partnerForm');
-  partnerForm.addEventListener('submit', async (e) => {
+  partnerForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    alert("협업 문의 폼 전송 시작 (테스트 알림)");
     console.log("📨 partnerForm submit");
 
     const btn = document.getElementById('partnerSubmit');
@@ -456,31 +467,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setButtonState(btn, '전송 중입니다...', true);
     statusEl.textContent = '';
 
-    const form = e.target;
+    const f = e.target;
     const payload = {
-      type: form.type.value,
-      company: form.company.value.trim(),
-      manager: form.manager.value.trim(),
-      phone: form.phone.value.trim(),
-      email: form.email.value.trim(),
-      schedule: form.schedule.value.trim(),
-      message: form.message.value.trim()
+      type: f.type.value,
+      company: f.company.value.trim(),
+      manager: f.manager.value.trim(),
+      phone: f.phone.value.trim(),
+      email: f.email.value.trim(),
+      schedule: f.schedule.value.trim(),
+      message: f.message.value.trim()
     };
+
+    console.log("partner payload:", payload);
 
     const { error } = await sb.from('partner_inquiries').insert([payload]);
 
-    if(error){
+    if (error) {
       console.error("❌ partner error:", error);
-      alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      alert("Supabase 저장 중 오류가 발생했습니다.\n콘솔 로그를 확인해 주세요.");
       setButtonState(btn, '협업 문의 보내기', false);
       return;
     }
 
-    window.location.href = 'thanks.html';
+    window.location.href = "thanks.html";
   });
-});
+
+})();
 </script>
 
 </body>
 </html>
-
