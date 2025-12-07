@@ -5,9 +5,8 @@
   <title>대신전기인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
-
+  <!-- Supabase JS (jsDelivr CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
 
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -208,7 +207,6 @@
             💬 카카오톡 문의
           </button>
         </div>
-        <!-- ✅ 여기에서 50~60대 문구 삭제하고 한 줄만 남김 -->
         <p style="font-size:12px;color:#cbd5e1;">
           * 급한 건은 전화가 가장 빠릅니다.
         </p>
@@ -397,13 +395,15 @@
 </footer>
 
 <script>
-  // 1) 여기 두 줄만 네 프로젝트 값으로 바꾸면 됨
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("🔧 JS Loaded");
+
+  // ★ 여기는 네 Supabase 값 그대로 사용
   const SUPABASE_URL = "https://xovvbkcngfcndhkhwyqd.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_O_RB3eRmGYDRZfwifbw0CQ_izEVLwGJ";
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // 공통: 버튼 상태 바꾸기
   function setButtonState(button, text, disabled){
     button.textContent = text;
     button.disabled = disabled;
@@ -411,8 +411,11 @@
   }
 
   // ▶ 전기 인력 채용 지원 폼
-  document.getElementById('recruitForm').addEventListener('submit', async (e) => {
+  const recruitForm = document.getElementById('recruitForm');
+  recruitForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log("📨 recruitForm submit");
+
     const btn = document.getElementById('recruitSubmit');
     const statusEl = document.getElementById('recruitStatus');
     setButtonState(btn, '전송 중입니다...', true);
@@ -432,20 +435,22 @@
     const { error } = await sb.from('recruit_applications').insert([payload]);
 
     if(error){
-      statusEl.style.color = '#f97373';
-      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
-      console.error(error);
-    }else{
-      statusEl.style.color = '#4ade80';
-      statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
-      form.reset();
+      console.error("❌ recruit error:", error);
+      alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setButtonState(btn, '지원서 보내기', false);
+      return;
     }
-    setButtonState(btn, '지원서 보내기', false);
+
+    // 성공시 thanks.html 로 이동
+    window.location.href = 'thanks.html';
   });
 
   // ▶ 협업 · 제휴 문의 폼
-  document.getElementById('partnerForm').addEventListener('submit', async (e) => {
+  const partnerForm = document.getElementById('partnerForm');
+  partnerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log("📨 partnerForm submit");
+
     const btn = document.getElementById('partnerSubmit');
     const statusEl = document.getElementById('partnerStatus');
     setButtonState(btn, '전송 중입니다...', true);
@@ -465,17 +470,17 @@
     const { error } = await sb.from('partner_inquiries').insert([payload]);
 
     if(error){
-      statusEl.style.color = '#f97373';
-      statusEl.textContent = '전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
-      console.error(error);
-    }else{
-      statusEl.style.color = '#4ade80';
-      statusEl.textContent = '정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.';
-      form.reset();
+      console.error("❌ partner error:", error);
+      alert('전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setButtonState(btn, '협업 문의 보내기', false);
+      return;
     }
-    setButtonState(btn, '협업 문의 보내기', false);
+
+    window.location.href = 'thanks.html';
   });
+});
 </script>
 
 </body>
 </html>
+
