@@ -5,6 +5,9 @@
   <title>대신전기인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+ <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
 
@@ -394,190 +397,191 @@
   © 대신전기인력. All Rights Reserved.
 </footer>
 
-<!-- EmailJS 라이브러리 (head 끝이나 body 맨 아래에 추가) -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-  /* 1) Supabase 설정  ---------------------------------- */
-  // ⚠️ 프로젝트 URL을 설정 화면에서 그대로 복붙해야 함.
-  //    (뒤에 / 없이) 예: https://xovvbkcngfcndhkhwyqd.supabase.co
-  const SUPABASE_URL = "https://xovvbkcngfcndhkhwyqd.supabase.co";
-  const SUPABASE_ANON_KEY =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvdnZia2NuZ2ZjbmRraHh3eXFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwMDk0MTIsImV4cCI6MjA4MDU4NTQxMn0.s2e3JSoZNzAkrGwffi45cBVzOHCLIR-NP4RsdRCXVMs";
+/* =======================
+   0) 안전 체크
+======================= */
+if (typeof supabase === "undefined") {
+  alert("Supabase 라이브러리가 로딩되지 않았습니다. <head>에 supabase.min.js가 있는지 확인하세요.");
+}
+if (typeof emailjs === "undefined") {
+  alert("EmailJS 라이브러리가 로딩되지 않았습니다. <head>에 email.min.js가 있는지 확인하세요.");
+}
 
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+/* =======================
+   1) Supabase 설정
+======================= */
+const SUPABASE_URL = "https://xovvbkcngfcndhkhwyqd.supabase.co"; // ✅ / 없이
+const SUPABASE_ANON_KEY = "sb_publishable_O_RB3eRmGYDRZfwIfbWoCQ_izEVlw6J";
 
-  /* 2) EmailJS 설정  ----------------------------------- */
-  // EmailJS 대시보드에서 복사한 값으로 바꿔 넣기!
-  const EMAILJS_PUBLIC_KEY = "Dg6kq6qcxRykF-dpn";
-  const EMAILJS_SERVICE_ID  = "daesin-work";   // 
-  const EMAILJS_TEMPLATE_ID = "daesin-work";              //
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (function () {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  })();
+/* =======================
+   2) EmailJS 설정
+======================= */
+const EMAILJS_PUBLIC_KEY  = "Dg6kq6qcxRykF-dpn";
+const EMAILJS_SERVICE_ID  = "daesin-work";  // ✅ Service ID (대시보드 그대로)
+const EMAILJS_TEMPLATE_ID = "daesin-work";  // ✅ Template ID (대시보드 그대로)
 
-  /* 공통: 버튼 상태  ----------------------------------- */
-  function setButtonState(button, text, disabled) {
-    button.textContent = text;
-    button.disabled = disabled;
-    button.style.opacity = disabled ? 0.6 : 1;
+emailjs.init(EMAILJS_PUBLIC_KEY);
+
+/* =======================
+   공통: 버튼 상태
+======================= */
+function setButtonState(button, text, disabled) {
+  button.textContent = text;
+  button.disabled = disabled;
+  button.style.opacity = disabled ? 0.6 : 1;
+}
+
+/* =======================
+   공통: 값 정리
+======================= */
+function v(x) {
+  return (x ?? "").toString().trim();
+}
+
+/* =======================
+   공통: 메일 보내기
+   - 템플릿에 {{title}}, {{name}}, {{message}} 있어야 함
+======================= */
+async function sendMail({ title, name, message }) {
+  return emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_TEMPLATE_ID,
+    { title, name, message }
+  );
+}
+
+/* ============================================================
+   3) 채용 지원 폼 (recruitForm)
+============================================================ */
+document.getElementById("recruitForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById("recruitSubmit");
+  const statusEl = document.getElementById("recruitStatus");
+  setButtonState(btn, "전송 중입니다...", true);
+  statusEl.textContent = "";
+
+  const f = e.target;
+
+  const payload = {
+    region: v(f.region.value),
+    age: v(f.age.value),
+    career: v(f.career.value),
+    specialty: v(f.specialty.value),
+    car_own: v(f.car_own.value),
+    phone: v(f.phone.value),
+    memo: v(f.memo.value),
+  };
+
+  console.log("[recruit] payload:", payload);
+
+  try {
+    // 1) Supabase 저장
+    const { error } = await sb.from("recruit_applications").insert([payload]);
+    if (error) throw error;
+
+    // 2) EmailJS 메일 전송
+    const mailTitle = "전기 인력 채용 지원";
+    const mailName  = `${payload.region} / ${payload.age}세 / ${payload.career}`;
+    const mailMsg =
+      `✅ 전기 인력 채용 지원 접수\n\n` +
+      `지역: ${payload.region}\n` +
+      `나이: ${payload.age}\n` +
+      `전기공 경력: ${payload.career}\n` +
+      `주특기: ${payload.specialty}\n` +
+      `자차 여부: ${payload.car_own}\n` +
+      `연락처: ${payload.phone}\n` +
+      `기타 메모: ${payload.memo}\n`;
+
+    try {
+      await sendMail({ title: mailTitle, name: mailName, message: mailMsg });
+      console.log("[recruit] EmailJS sent");
+    } catch (mailErr) {
+      // DB는 저장됐으니, 메일만 실패했을 때 로그로만 남김
+      console.error("[recruit] EmailJS error:", mailErr);
+    }
+
+    statusEl.style.color = "#4ade80";
+    statusEl.textContent = "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
+    f.reset();
+
+  } catch (err) {
+    console.error("[recruit] error:", err);
+    statusEl.style.color = "#f97373";
+    statusEl.textContent = "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+    alert("전송 오류: " + (err?.message || err));
+  } finally {
+    setButtonState(btn, "지원서 보내기", false);
   }
+});
 
-  /* 3) 전기 인력 채용 지원 폼 --------------------------- */
-  document.getElementById("recruitForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("recruitSubmit");
-    const statusEl = document.getElementById("recruitStatus");
-    setButtonState(btn, "전송 중입니다...", true);
-    statusEl.textContent = "";
+/* ============================================================
+   4) 협업/제휴 문의 폼 (partnerForm)
+============================================================ */
+document.getElementById("partnerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const form = e.target;
-    const payload = {
-      region: form.region.value.trim(),
-      age: form.age.value.trim(),
-      career: form.career.value.trim(),
-      specialty: form.specialty.value.trim(),
-      car_own: form.car_own.value,
-      phone: form.phone.value.trim(),
-      memo: form.memo.value.trim(),
-    };
+  const btn = document.getElementById("partnerSubmit");
+  const statusEl = document.getElementById("partnerStatus");
+  setButtonState(btn, "전송 중입니다...", true);
+  statusEl.textContent = "";
 
-    console.log("[recruit] payload:", payload);
+  const f = e.target;
 
-    try {
-      const { data, error } = await sb.from("recruit_applications").insert([payload]);
-      console.log("[recruit] data:", data, "error:", error);
+  const payload = {
+    type: v(f.type.value),
+    company: v(f.company.value),
+    manager: v(f.manager.value),
+    phone: v(f.phone.value),
+    email: v(f.email.value),
+    schedule: v(f.schedule.value),
+    message: v(f.message.value),
+  };
 
-      if (error) {
-        alert(
-          "Supabase 저장 중 오류가 발생했습니다.\n\nmessage: " +
-            error.message +
-            "\n\nstatus: " +
-            error.status
-        );
-        statusEl.style.color = "#f97373";
-        statusEl.textContent =
-          "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-      } else {
-        // 3-1) DB 저장 성공 → EmailJS로 알림메일 전송
-        const emailParams = {
-          title: "전기 인력 채용 지원",
-          name: payload.region + " / " + payload.age + "세 / " + payload.career,
-          message:
-            "지역: " + payload.region + "\n" +
-            "나이: " + payload.age + "\n" +
-            "전기공 경력: " + payload.career + "\n" +
-            "주특기: " + payload.specialty + "\n" +
-            "자차 여부: " + payload.car_own + "\n" +
-            "연락처: " + payload.phone + "\n" +
-            "기타 메모: " + payload.memo + "\n",
-        };
+  console.log("[partner] payload:", payload);
 
-        try {
-          await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            emailParams
-          );
-        } catch (mailErr) {
-          console.error("[recruit] emailjs error:", mailErr);
-          // 메일 실패해도 DB에는 들어갔으니 안내만 조용히…
-        }
+  try {
+    // 1) Supabase 저장
+    const { error } = await sb.from("partner_inquiries").insert([payload]);
+    if (error) throw error;
 
-        statusEl.style.color = "#4ade80";
-        statusEl.textContent =
-          "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
-        form.reset();
-      }
-    } catch (err) {
-      console.error("[recruit] exception:", err);
-      alert("Supabase 저장 중 오류가 발생했습니다.\n\n(details: " + err + ")");
-      statusEl.style.color = "#f97373";
-      statusEl.textContent =
-        "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-    } finally {
-      setButtonState(btn, "지원서 보내기", false);
-    }
-  });
-
-  /* 4) 협업 · 제휴 문의 폼 ------------------------------ */
-  document.getElementById("partnerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("partnerSubmit");
-    const statusEl = document.getElementById("partnerStatus");
-    setButtonState(btn, "전송 중입니다...", true);
-    statusEl.textContent = "";
-
-    const form = e.target;
-    const payload = {
-      type: form.type.value,
-      company: form.company.value.trim(),
-      manager: form.manager.value.trim(),
-      phone: form.phone.value.trim(),
-      email: form.email.value.trim(),
-      schedule: form.schedule.value.trim(),
-      message: form.message.value.trim(),
-    };
-
-    console.log("[partner] payload:", payload);
+    // 2) EmailJS 메일 전송
+    const mailTitle = "협업 · 제휴 문의";
+    const mailName  = `${payload.company} / ${payload.manager}`;
+    const mailMsg =
+      `✅ 협업 · 제휴 문의 접수\n\n` +
+      `협업 분야: ${payload.type}\n` +
+      `회사명: ${payload.company}\n` +
+      `담당자: ${payload.manager}\n` +
+      `연락처: ${payload.phone}\n` +
+      `이메일: ${payload.email}\n` +
+      `희망 일정: ${payload.schedule}\n\n` +
+      `상세 내용:\n${payload.message}\n`;
 
     try {
-      const { data, error } = await sb
-        .from("partner_inquiries")
-        .insert([payload]);
-      console.log("[partner] data:", data, "error:", error);
-
-      if (error) {
-        alert(
-          "Supabase 저장 중 오류가 발생했습니다.\n\nmessage: " +
-            error.message +
-            "\n\nstatus: " +
-            error.status
-        );
-        statusEl.style.color = "#f97373";
-        statusEl.textContent =
-          "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-      } else {
-        // 4-1) DB 저장 성공 → EmailJS 메일 전송
-        const emailParams = {
-          title: "협업 · 제휴 문의",
-          name: payload.company + " / " + payload.manager,
-          message:
-            "협업 분야: " + payload.type + "\n" +
-            "회사명: " + payload.company + "\n" +
-            "담당자: " + payload.manager + "\n" +
-            "연락처: " + payload.phone + "\n" +
-            "이메일: " + payload.email + "\n" +
-            "희망 일정: " + payload.schedule + "\n" +
-            "상세 내용:\n" + payload.message + "\n",
-        };
-
-        try {
-          await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            emailParams
-          );
-        } catch (mailErr) {
-          console.error("[partner] emailjs error:", mailErr);
-        }
-
-        statusEl.style.color = "#4ade80";
-        statusEl.textContent =
-          "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
-        form.reset();
-      }
-    } catch (err) {
-      console.error("[partner] exception:", err);
-      alert("Supabase 저장 중 오류가 발생했습니다.\n\n(details: " + err + ")");
-      statusEl.style.color = "#f97373";
-      statusEl.textContent =
-        "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
-    } finally {
-      setButtonState(btn, "협업 문의 보내기", false);
+      await sendMail({ title: mailTitle, name: mailName, message: mailMsg });
+      console.log("[partner] EmailJS sent");
+    } catch (mailErr) {
+      console.error("[partner] EmailJS error:", mailErr);
     }
-  });
+
+    statusEl.style.color = "#4ade80";
+    statusEl.textContent = "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
+    f.reset();
+
+  } catch (err) {
+    console.error("[partner] error:", err);
+    statusEl.style.color = "#f97373";
+    statusEl.textContent = "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+    alert("전송 오류: " + (err?.message || err));
+  } finally {
+    setButtonState(btn, "협업 문의 보내기", false);
+  }
+});
 </script>
 
 </body>
