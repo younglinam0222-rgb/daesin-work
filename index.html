@@ -184,7 +184,7 @@
     <a href="#top" class="logo">대신전기인력</a>
     <nav class="nav-menu">
       <a href="#service">업무소개</a>
-      <a href="#recruit">구인</a>
+      <a href="#recruit">구직</a>
       <a href="#partner">협업문의</a>
       <a class="nav-call" href="tel:0328876293">전화 032-887-6293</a>
     </nav>
@@ -277,10 +277,10 @@
     </div>
   </section>
 
-  <!-- 전기 인력 구인 문의 -->
+  <!-- 전기 인력 구직 문의 -->
   <section class="section" id="recruit">
     <div class="inner">
-      <h2 class="title">전기 인력 구인 문의</h2>
+      <h2 class="title">전기 인력 구직 문의</h2>
       <p class="sub">
         간단히 작성해 주시면 담당자가 확인 후 바로 전화드립니다.
       </p>
@@ -455,7 +455,7 @@ async function sendMail({ title, name, message }) {
 }
 
 /* ============================================================
-   3) 구인 문의 폼 (recruitForm)
+   3) 구직 문의 폼 (recruitForm)
 ============================================================ */
 document.getElementById("recruitForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -485,10 +485,10 @@ document.getElementById("recruitForm").addEventListener("submit", async (e) => {
     if (error) throw error;
 
     // 2) EmailJS 메일 전송
-    const mailTitle = "전기 인력 구인 문의";
+    const mailTitle = "전기 인력 구직 문의";
     const mailName  = `${payload.region} / ${payload.age}세 / ${payload.career}`;
     const mailMsg =
-      `✅ 전기 인력 구인 문의 접수\n\n` +
+      `✅ 전기 인력 구직 문의 접수\n\n` +
       `지역: ${payload.region}\n` +
       `나이: ${payload.age}\n` +
       `전기공 경력: ${payload.career}\n` +
