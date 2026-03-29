@@ -2,511 +2,749 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>대신전기인력 · 전기 전문 인력사무소</title>
+  <title>대신인력 · 전기 전문 인력사무소</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
- <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
+  <meta name="description" content="배선·배관·트레이·조명·동력·통신 전기공사 전 분야 숙련 인력 공급. 인천·수도권 중심 전국 협력 네트워크. 대신인력">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.48.0/dist/umd/supabase.min.js"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family:'Noto Sans KR',sans-serif;
-      background:#020617; 
-      color:#f1f5f9; 
-      line-height:1.6;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0B1D3A; --navy-mid:#112548; --navy-light:#1A3560;
+      --blue:#1A6FC4; --blue-bright:#2B8AE8; --blue-light:#4FA3F7;
+      --accent:#F5A623; --accent-dark:#D48A10;
+      --green:#22C55E; --green-dark:#15803D;
+      --white:#FFFFFF; --off-white:#F5F7FA;
+      --gray-100:#EEF1F7; --gray-200:#DDE2EC; --gray-400:#9AA5B8; --gray-600:#4B5B73;
+      --text:#1A2640; --text-soft:#4B5B73;
+      --border:rgba(26,54,96,0.12);
+      --shadow-sm:0 2px 8px rgba(11,29,58,0.08);
+      --shadow-md:0 4px 24px rgba(11,29,58,0.12);
+      --shadow-lg:0 8px 48px rgba(11,29,58,0.16);
+      --radius:12px; --radius-lg:20px;
+      --tr:0.25s cubic-bezier(0.4,0,0.2,1);
     }
-    a{text-decoration:none;color:inherit;}
+    html { scroll-behavior: smooth; }
+    body { font-family:'Noto Sans KR',sans-serif; background:var(--white); color:var(--text); line-height:1.6; overflow-x:hidden; }
+    a { text-decoration:none; color:inherit; }
+    img { max-width:100%; }
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:var(--gray-100); }
+    ::-webkit-scrollbar-thumb { background:var(--blue); border-radius:3px; }
 
-    :root{
-      --color-primary-blue: #0ea5e9;
-      --color-primary-dark: #0369a1; 
-      --color-accent-gold: #f59e0b; 
-      --color-call-green: #22c55e;
-      --color-kakao-yellow: #fee500;
-      --color-bg-panel: #131a37; 
-      --color-border: #1f2937;
-    }
+    /* ── PROGRESS BAR ── */
+    .progress-bar { position:fixed; top:0; left:0; z-index:9999; height:3px; width:0%; background:linear-gradient(90deg,var(--blue),var(--blue-light),var(--accent)); transition:width .2s; }
 
-    header{
-      position:sticky;top:0;z-index:50;
-      background:rgba(15,23,42,0.98);
-      border-bottom:1px solid #1f2937;
-    }
-    .nav{
-      max-width:1100px;margin:0 auto;
-      padding:12px 16px;
-      display:flex;align-items:center;
-      justify-content:space-between;
-    }
-    .logo{font-size:22px;font-weight:800;color:var(--color-primary-blue);}
-    .nav-menu{display:flex;gap:16px;font-size:15px;}
-    .nav-menu a{padding:6px 10px;border-radius:999px;font-weight:700;}
-    .nav-menu a:hover{background:#1d293b;}
-    .nav-call{
-      background:var(--color-call-green);color:#022c22;
-      padding:8px 16px;border-radius:999px;
-      font-weight:700;
-      font-size:15px;
-    }
+    /* ── HEADER ── */
+    header { position:fixed; top:0; left:0; right:0; z-index:1000; background:rgba(11,29,58,.97); backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,.07); transition:var(--tr); }
+    header.scrolled { background:rgba(11,29,58,.99); box-shadow:0 2px 24px rgba(0,0,0,.3); }
+    .nav-inner { max-width:1200px; margin:0 auto; padding:0 24px; height:68px; display:flex; align-items:center; justify-content:space-between; }
+    .logo-wrap { display:flex; align-items:center; gap:10px; }
+    .logo-icon { width:36px; height:36px; background:var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; color:#fff; flex-shrink:0; }
+    .logo-text { font-size:17px; font-weight:700; color:#fff; letter-spacing:-.3px; }
+    .logo-sub { font-size:10px; color:rgba(255,255,255,.5); letter-spacing:1px; text-transform:uppercase; }
+    .gnb { display:flex; align-items:center; gap:4px; }
+    .gnb a { padding:8px 14px; border-radius:8px; font-size:14px; color:rgba(255,255,255,.75); font-weight:500; transition:var(--tr); }
+    .gnb a:hover { color:#fff; background:rgba(255,255,255,.08); }
+    .header-cta { display:flex; align-items:center; gap:8px; }
+    .btn-call-hd { background:var(--green); color:#fff; padding:8px 16px; border-radius:999px; font-size:13px; font-weight:700; border:none; display:flex; align-items:center; gap:6px; transition:var(--tr); }
+    .btn-call-hd:hover { background:var(--green-dark); transform:translateY(-1px); }
+    .btn-kakao-hd { background:#FEE500; color:#1A1A1A; padding:8px 14px; border-radius:999px; font-size:13px; font-weight:700; border:none; transition:var(--tr); display:inline-flex; align-items:center; gap:5px; }
+    .btn-kakao-hd:hover { background:#F5DB00; transform:translateY(-1px); }
 
-    .section{padding:50px 16px;}
-    .inner{max-width:1100px;margin:0 auto;}
+    /* ── HAMBURGER ── */
+    .hamburger { display:none; flex-direction:column; gap:5px; padding:8px; cursor:pointer; background:none; border:none; }
+    .hamburger span { display:block; width:22px; height:2px; background:#fff; border-radius:2px; transition:var(--tr); }
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+    .mobile-menu { display:none; position:fixed; top:68px; left:0; right:0; z-index:999; background:rgba(11,29,58,.98); padding:16px 24px 24px; border-bottom:1px solid rgba(255,255,255,.07); }
+    .mobile-menu.open { display:block; }
+    .mobile-menu a { display:block; padding:12px 0; font-size:15px; color:rgba(255,255,255,.8); font-weight:500; border-bottom:1px solid rgba(255,255,255,.06); transition:var(--tr); }
+    .mobile-menu a:hover { color:#fff; }
+    .mobile-ctas { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+    .mobile-ctas a { flex:1; min-width:130px; text-align:center; padding:11px 8px; border-radius:10px; font-weight:700; font-size:13px; border-bottom:none; }
+    .mc-call { background:var(--green); color:#fff; }
+    .mc-k1 { background:#FEE500; color:#1A1A1A; }
+    .mc-k2 { background:#F5DB00; color:#1A1A1A; }
 
-    /* 배경 QR코드 오류 수정 완료 */
-    .hero{
-      background:radial-gradient(circle at top left,#0ea5e950,#020617);
-      border-bottom:1px solid #1f2937;
-    }
-    .hero-grid{
-      display:grid;gap:24px;
-      grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);
-      align-items:center;
-    }
-    .hero-title{
-      font-size:32px;font-weight:800;margin-bottom:12px;
-      line-height: 1.2;
-    }
-    .hero-title strong{color:var(--color-accent-gold);}
-    .hero-text{font-size:16px;color:#e5e7eb;margin-bottom:18px; line-height: 1.5;}
-    
-    .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:11px 20px;border-radius:999px;
-      font-size:15px;font-weight:700;cursor:pointer;
-      border:1px solid transparent;
-      transition: all 0.3s;
-    }
-    .btn-call{background:var(--color-call-green);color:#022c22;border-color:#16a34a;}
-    .btn-call:hover{background:#16a34a;}
-    .btn-kakao-link{background:var(--color-kakao-yellow);color:#1f2937;border-color:#eab308;}
-    .btn-kakao-link:hover{background:#eab308;}
+    /* ── HERO ── */
+    .hero { min-height:100vh; background:var(--navy); position:relative; overflow:hidden; display:flex; align-items:center; padding-top:68px; }
+    .hero-bg { position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(42,138,232,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(42,138,232,.05) 1px,transparent 1px); background-size:60px 60px; animation:gridMove 20s linear infinite; }
+    @keyframes gridMove{to{background-position:60px 60px;}}
+    .hero-gradient { position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 70% 60% at 20% 50%,rgba(26,111,196,.25) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 80% 20%,rgba(42,138,232,.12) 0%,transparent 60%); }
+    .orb { position:absolute; border-radius:50%; pointer-events:none; filter:blur(60px); opacity:.15; animation:floatOrb 8s ease-in-out infinite; }
+    .orb-1{width:500px;height:500px;background:var(--blue);top:-100px;left:-100px;}
+    .orb-2{width:300px;height:300px;background:var(--accent);top:40%;right:10%;animation-delay:3s;}
+    .orb-3{width:200px;height:200px;background:var(--blue-bright);bottom:10%;left:30%;animation-delay:5s;}
+    @keyframes floatOrb{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.05);}}
 
-    .hero-card{
-      background:rgba(15,23,42,0.92);
-      border-radius:20px;padding:22px;
-      border:1px solid #1f2937;
-      font-size:15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    .hero-row{margin-bottom:10px;}
-    .hero-label{font-size:12px;color:#9ca3af;}
-    .hero-value{font-weight:700;}
-    .hero-value a:hover {color:var(--color-primary-blue);}
-    img.qr{width:160px;border-radius:14px;margin-top:10px; border:2px solid var(--color-border);}
+    .hero-inner { max-width:1200px; margin:0 auto; padding:80px 24px; display:grid; grid-template-columns:1fr 420px; gap:56px; align-items:center; position:relative; z-index:1; }
 
-    .title{font-size:26px;font-weight:800;margin-bottom:8px; text-align: center;}
-    .sub{font-size:14px;color:#9ca3af;margin-bottom:22px; text-align: center;}
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(26,111,196,.2); border:1px solid rgba(79,163,247,.3); padding:6px 14px; border-radius:999px; margin-bottom:22px; font-size:13px; color:var(--blue-light); font-weight:500; animation:fadeUp .8s ease-out both; }
+    .hero-badge .dot { width:7px; height:7px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
 
-    .two-grid{
-      display:grid;gap:20px;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-    }
-    .panel{
-      background:var(--color-bg-panel);
-      border-radius:18px;
-      border:1px solid var(--color-border);
-      padding:22px;
-      font-size:15px;
-      transition: transform 0.3s;
-    }
-    .panel:hover { transform: translateY(-3px); }
-    .panel h3{font-size:20px;margin-bottom:10px; color:var(--color-accent-gold);}
-    .panel ul{margin-left:18px;margin-top:5px;}
-    .panel li{margin-bottom:5px;}
+    .hero-title { font-size:52px; font-weight:900; color:#fff; line-height:1.15; letter-spacing:-1.5px; margin-bottom:18px; animation:fadeUp .8s .1s ease-out both; }
+    .hero-title .accent { color:var(--accent); }
+    .hero-desc { font-size:16px; color:rgba(255,255,255,.65); line-height:1.85; margin-bottom:32px; max-width:520px; animation:fadeUp .8s .2s ease-out both; }
 
-    .form-grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:14px 18px;
-      margin-top:12px;
-    }
-    .form-row-full{
-      grid-column:1 / -1;
-    }
-    label{
-      display:block;
-      font-size:15px;
-      margin-bottom:5px;
-      color:#e5e7eb;
-    }
-    input, select, textarea{
-      width:100%;
-      padding:11px 12px;
-      border-radius:10px;
-      border:1px solid #374151;
-      background:#020617;
-      color:#e5e7eb;
-      font-size:16px;
-    }
-    textarea{min-height:100px;resize:vertical;}
+    .hero-actions { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; animation:fadeUp .8s .3s ease-out both; }
+    .btn-green { background:var(--green); color:#fff; padding:12px 24px; border-radius:999px; font-size:14px; font-weight:700; border:none; display:inline-flex; align-items:center; gap:7px; transition:var(--tr); box-shadow:0 4px 18px rgba(34,197,94,.3); }
+    .btn-green:hover { background:var(--green-dark); transform:translateY(-2px); }
+    .btn-kakao { background:#FEE500; color:#1A1A1A; padding:12px 20px; border-radius:999px; font-size:14px; font-weight:700; border:none; display:inline-flex; align-items:center; gap:7px; transition:var(--tr); }
+    .btn-kakao:hover { background:#F5DB00; transform:translateY(-2px); }
+    .btn-kakao2 { background:#F5DB00; }
+    .btn-outline { background:transparent; color:rgba(255,255,255,.8); padding:12px 20px; border-radius:999px; font-size:14px; font-weight:500; border:1px solid rgba(255,255,255,.2); display:inline-flex; align-items:center; gap:7px; transition:var(--tr); }
+    .btn-outline:hover { border-color:rgba(255,255,255,.5); color:#fff; background:rgba(255,255,255,.05); }
 
-    .btn-full{
-      display:block;text-align:center;
-      margin-top:18px;
-      background:var(--color-primary-blue);
-      border-radius:999px;
-      padding:13px 0;
-      font-weight:800;
-      font-size:16px;
-      cursor:pointer;
-      border:none;
-      width:100%;
-      transition: background-color 0.3s;
-    }
-    .btn-full:hover{background:var(--color-primary-dark);}
+    .hero-hint { font-size:12px; color:rgba(255,255,255,.35); margin-bottom:28px; animation:fadeUp .8s .35s ease-out both; }
+    .hero-stats { display:flex; gap:28px; animation:fadeUp .8s .4s ease-out both; }
+    .hs-num { font-size:24px; font-weight:900; color:#fff; line-height:1; }
+    .hs-num span { color:var(--accent); }
+    .hs-label { font-size:12px; color:rgba(255,255,255,.5); margin-top:3px; }
 
-    .notice{
-      margin-top:12px;
-      font-size:14px;
-      color:#9ca3af;
-      line-height:1.5;
-    }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+    .fade-up { opacity:0; transform:translateY(24px); transition:opacity .7s ease-out,transform .7s ease-out; }
+    .fade-up.visible { opacity:1; transform:translateY(0); }
 
-    .status-msg{
-      margin-top:10px;
-      font-size:14px;
-      text-align: center;
-    }
+    /* ── HERO CARD ── */
+    .hero-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:28px; backdrop-filter:blur(20px); animation:fadeUp .8s .2s ease-out both; }
+    .card-hdr { display:flex; align-items:center; gap:10px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .card-hdr-title { font-size:15px; font-weight:700; color:#fff; }
+    .card-hdr-sub { font-size:11px; color:rgba(255,255,255,.4); }
+    .info-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; }
+    .info-ic { width:28px; height:28px; flex-shrink:0; background:rgba(26,111,196,.2); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:12px; }
+    .info-lbl { font-size:10px; color:rgba(255,255,255,.4); margin-bottom:1px; }
+    .info-val { font-size:13px; color:rgba(255,255,255,.9); font-weight:500; }
+    .info-val a { color:rgba(255,255,255,.9); }
+    .info-val a:hover { color:var(--blue-light); }
+    .lic-box { margin-top:14px; padding:11px; background:rgba(26,111,196,.1); border:1px solid rgba(26,111,196,.2); border-radius:10px; }
+    .lic-row { display:flex; justify-content:space-between; margin-bottom:4px; }
+    .lic-row:last-child{margin-bottom:0;}
+    .lic-k { font-size:10px; color:rgba(255,255,255,.4); }
+    .lic-v { font-size:10px; color:rgba(255,255,255,.7); font-weight:500; }
+    .kakao-btns { display:flex; gap:7px; margin-top:13px; }
+    .kbtn { flex:1; padding:9px 8px; border-radius:9px; font-size:12px; font-weight:700; text-align:center; background:#FEE500; color:#1A1A1A; transition:var(--tr); border:none; }
+    .kbtn:hover { background:#F5DB00; transform:translateY(-1px); }
+    .qr-sec { margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:12px; }
+    .qr-img { width:68px; height:68px; border-radius:9px; background:#fff; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; color:#666; }
+    .qr-img img { width:100%; height:100%; object-fit:cover; }
+    .qr-id { font-size:15px; font-weight:700; color:#FEE500; }
+    .qr-desc { font-size:11px; color:rgba(255,255,255,.4); margin-top:2px; }
 
-    footer{
-      padding:22px 16px;
-      border-top:1px solid #1f2937;
-      font-size:12px;
-      color:#9ca3af;text-align:center;
-    }
+    /* ── STATS ── */
+    .stats-section { background:var(--navy); padding:80px 24px; position:relative; overflow:hidden; }
+    .stats-bg { position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(26,111,196,.15) 0%,transparent 70%); }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,.06); border-radius:var(--radius-lg); overflow:hidden; position:relative; z-index:1; }
+    .stat-item { padding:44px 28px; background:var(--navy-mid); text-align:center; transition:var(--tr); }
+    .stat-item:hover { background:var(--navy-light); }
+    .stat-num { font-size:44px; font-weight:900; color:#fff; line-height:1; letter-spacing:-2px; }
+    .stat-num .unit { font-size:26px; color:var(--accent); }
+    .stat-label { font-size:13px; color:rgba(255,255,255,.5); margin-top:10px; }
 
+    /* ── SECTION COMMON ── */
+    .section { padding:96px 24px; }
+    .section-alt { background:var(--off-white); }
+    .inner { max-width:1200px; margin:0 auto; }
+    .eyebrow { display:inline-block; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:10px; }
+    .s-title { font-size:36px; font-weight:900; letter-spacing:-1px; line-height:1.2; margin-bottom:14px; }
+    .s-desc { font-size:16px; color:var(--text-soft); max-width:540px; line-height:1.8; }
+
+    /* ── SERVICES ── */
+    .svc-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-top:56px; }
+    .svc-card { background:#fff; border-radius:var(--radius-lg); border:1px solid var(--border); padding:34px; position:relative; overflow:hidden; transition:var(--tr); box-shadow:var(--shadow-sm); }
+    .svc-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); border-color:rgba(26,111,196,.2); }
+    .svc-card.feat { background:var(--navy); border-color:transparent; grid-column:span 2; }
+    .svc-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--blue-light)); opacity:0; transition:var(--tr); }
+    .svc-card:hover::before { opacity:1; }
+    .svc-icon { width:52px; height:52px; border-radius:13px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:16px; transition:var(--tr); }
+    .svc-card:hover .svc-icon { background:rgba(26,111,196,.1); transform:scale(1.05); }
+    .svc-card.feat .svc-icon { background:rgba(255,255,255,.1); }
+    .svc-title { font-size:19px; font-weight:800; margin-bottom:9px; letter-spacing:-.4px; }
+    .svc-card.feat .svc-title { color:#fff; }
+    .svc-text { font-size:14px; color:var(--text-soft); line-height:1.8; }
+    .svc-card.feat .svc-text { color:rgba(255,255,255,.6); }
+    .svc-tags { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+    .svc-tag { padding:4px 11px; border-radius:999px; background:var(--gray-100); color:var(--text-soft); font-size:12px; font-weight:500; }
+    .svc-card.feat .svc-tag { background:rgba(255,255,255,.1); color:rgba(255,255,255,.7); }
+    .feat-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:20px; }
+    .feat-col h4 { font-size:13px; font-weight:700; color:var(--blue-light); margin-bottom:9px; }
+    .feat-col ul { list-style:none; }
+    .feat-col ul li { font-size:13px; color:rgba(255,255,255,.7); padding:5px 0; border-bottom:1px solid rgba(255,255,255,.05); display:flex; align-items:center; gap:7px; }
+    .feat-col ul li::before { content:'—'; color:var(--blue-light); }
+
+    /* ── WHY ── */
+    .why-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:56px; }
+    .why-card { padding:30px; border-radius:var(--radius-lg); border:1px solid var(--border); background:#fff; transition:var(--tr); }
+    .why-card:hover { border-color:rgba(26,111,196,.3); box-shadow:var(--shadow-md); transform:translateY(-2px); }
+    .why-num { font-size:42px; font-weight:900; color:var(--gray-200); line-height:1; margin-bottom:12px; letter-spacing:-2px; }
+    .why-title { font-size:16px; font-weight:800; margin-bottom:9px; letter-spacing:-.4px; }
+    .why-text { font-size:14px; color:var(--text-soft); line-height:1.8; }
+
+    /* ── PROCESS ── */
+    .proc-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:56px; position:relative; }
+    .proc-steps::before { content:''; position:absolute; top:36px; left:12.5%; right:12.5%; height:2px; background:linear-gradient(90deg,var(--blue),var(--blue-light)); }
+    .proc-step { padding:0 14px; text-align:center; position:relative; z-index:1; }
+    .step-n { width:72px; height:72px; border-radius:50%; background:#fff; border:2px solid var(--blue); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:22px; font-weight:900; color:var(--blue); box-shadow:0 0 0 8px var(--off-white); transition:var(--tr); }
+    .proc-step:hover .step-n { background:var(--blue); color:#fff; }
+    .step-title { font-size:15px; font-weight:800; margin-bottom:7px; }
+    .step-desc { font-size:13px; color:var(--text-soft); line-height:1.7; }
+
+    /* ── FORMS ── */
+    .forms-section { padding:96px 24px; }
+    .forms-inner { max-width:1200px; margin:0 auto; }
+    .forms-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:56px; }
+    .fp { background:#fff; border-radius:var(--radius-lg); border:1px solid var(--border); padding:38px; box-shadow:var(--shadow-sm); }
+    .fp-icon { font-size:30px; margin-bottom:9px; }
+    .fp-title { font-size:20px; font-weight:800; margin-bottom:5px; letter-spacing:-.5px; }
+    .fp-desc { font-size:14px; color:var(--text-soft); line-height:1.7; margin-bottom:26px; }
+    .fg { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+    .ff { grid-column:1/-1; }
+    .fg-grp { display:flex; flex-direction:column; gap:5px; }
+    .fg-grp label { font-size:13px; font-weight:600; color:var(--text-soft); }
+    .fg-grp input,.fg-grp select,.fg-grp textarea { padding:11px 12px; border:1.5px solid var(--border); border-radius:9px; font-size:14px; color:var(--text); font-family:inherit; background:var(--off-white); transition:var(--tr); outline:none; }
+    .fg-grp input:focus,.fg-grp select:focus,.fg-grp textarea:focus { border-color:var(--blue); background:#fff; box-shadow:0 0 0 3px rgba(26,111,196,.1); }
+    .fg-grp textarea { min-height:96px; resize:vertical; }
+    .fg-grp select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%234B5B73' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+    .btn-sub { width:100%; margin-top:20px; padding:13px; border:none; border-radius:999px; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; transition:var(--tr); }
+    .btn-sub-blue { background:var(--blue); color:#fff; box-shadow:0 4px 14px rgba(26,111,196,.3); }
+    .btn-sub-blue:hover:not(:disabled) { background:var(--navy-light); transform:translateY(-2px); }
+    .btn-sub-green { background:var(--green); color:#fff; box-shadow:0 4px 14px rgba(34,197,94,.3); }
+    .btn-sub-green:hover:not(:disabled) { background:var(--green-dark); transform:translateY(-2px); }
+    .btn-sub:disabled { opacity:.6; cursor:not-allowed; transform:none!important; }
+    .f-notice { margin-top:13px; padding:12px; background:var(--gray-100); border-radius:9px; font-size:12px; color:var(--text-soft); line-height:1.7; }
+    .status-msg { margin-top:9px; font-size:13px; text-align:center; font-weight:500; }
+    .s-ok { color:var(--green-dark); }
+    .s-err { color:#DC2626; }
+
+    /* ── CTA ── */
+    .cta-sec { background:var(--navy); padding:80px 24px; position:relative; overflow:hidden; text-align:center; }
+    .cta-bg { position:absolute; inset:0; background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(26,111,196,.2) 0%,transparent 70%); }
+    .cta-in { position:relative; z-index:1; max-width:780px; margin:0 auto; }
+    .cta-title { font-size:40px; font-weight:900; color:#fff; letter-spacing:-1.5px; margin-bottom:12px; line-height:1.2; }
+    .cta-desc { font-size:16px; color:rgba(255,255,255,.6); margin-bottom:32px; }
+    .cta-acts { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-bottom:36px; }
+    .cta-contacts { display:flex; justify-content:center; flex-wrap:wrap; gap:36px; }
+    .cc-label { font-size:11px; color:rgba(255,255,255,.4); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px; }
+    .cc-value { font-size:16px; font-weight:700; color:#fff; }
+    .cc-value a { color:inherit; }
+
+    /* ── FOOTER ── */
+    footer { background:#060F20; color:rgba(255,255,255,.5); padding:56px 24px 30px; }
+    .footer-inner { max-width:1200px; margin:0 auto; }
+    .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr; gap:44px; margin-bottom:44px; }
+    .f-brand-desc { font-size:13px; line-height:1.8; margin-top:12px; }
+    .f-col h4 { font-size:12px; font-weight:700; color:rgba(255,255,255,.8); margin-bottom:13px; text-transform:uppercase; letter-spacing:1px; }
+    .f-col ul { list-style:none; }
+    .f-col ul li { margin-bottom:8px; }
+    .f-col ul li a { font-size:13px; transition:var(--tr); }
+    .f-col ul li a:hover { color:rgba(255,255,255,.8); }
+    .f-divider { border:none; border-top:1px solid rgba(255,255,255,.06); margin-bottom:20px; }
+    .f-bottom { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .f-copy { font-size:12px; }
+    .f-reg { font-size:11px; color:rgba(255,255,255,.3); }
+
+    /* ── FLOATING ── */
+    .floating-cta { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:10px; opacity:0; transform:translateY(20px); transition:var(--tr); pointer-events:none; }
+    .floating-cta.visible { opacity:1; transform:translateY(0); pointer-events:all; }
+    .fab-wrap { position:relative; display:flex; align-items:center; }
+    .fab { width:52px; height:52px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; font-size:21px; cursor:pointer; transition:var(--tr); box-shadow:var(--shadow-lg); text-decoration:none; }
+    .fab:hover { transform:scale(1.1); }
+    .fab-call { background:var(--green); }
+    .fab-kakao { background:#FEE500; }
+    .fab-top { background:var(--navy-mid); font-size:15px; color:#fff; }
+    .fab-lbl { position:absolute; right:60px; background:var(--navy); color:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:600; white-space:nowrap; opacity:0; transition:var(--tr); pointer-events:none; }
+    .fab-wrap:hover .fab-lbl { opacity:1; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:1024px){
+      .hero-title{font-size:40px;}
+      .hero-inner{grid-template-columns:1fr 360px;gap:36px;}
+      .svc-grid{grid-template-columns:1fr;}
+      .svc-card.feat{grid-column:span 1;}
+      .feat-grid{grid-template-columns:1fr;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+      .why-grid{grid-template-columns:repeat(2,1fr);}
+      .proc-steps{grid-template-columns:repeat(2,1fr);gap:32px;}
+      .proc-steps::before{display:none;}
+      .footer-grid{grid-template-columns:1fr 1fr;}
+    }
     @media(max-width:768px){
-      .hero-grid,.two-grid{grid-template-columns:minmax(0,1fr);}
-      .hero-title{font-size:26px;}
-      .nav-menu{gap:12px;font-size:14px;}
-      .nav-call{display:none;}
-      .form-grid{grid-template-columns:minmax(0,1fr);}
+      .gnb,.header-cta{display:none;}
+      .hamburger{display:flex;}
+      .hero-inner{grid-template-columns:1fr;padding:60px 0;}
+      .hero-card{display:none;}
+      .hero-title{font-size:30px;}
+      .hero-stats{gap:18px;}
+      .hs-num{font-size:20px;}
+      .section,.forms-section{padding:60px 24px;}
+      .s-title{font-size:26px;}
+      .why-grid{grid-template-columns:1fr;}
+      .proc-steps{grid-template-columns:1fr;}
+      .forms-grid{grid-template-columns:1fr;}
+      .fg{grid-template-columns:1fr;}
+      .footer-grid{grid-template-columns:1fr;}
+      .f-bottom{flex-direction:column;text-align:center;}
+      .cta-title{font-size:26px;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="nav">
-    <a href="#top" class="logo">대신전기인력</a>
-    <nav class="nav-menu">
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Floating CTA -->
+<div class="floating-cta" id="floatingCta">
+  <div class="fab-wrap">
+    <button class="fab fab-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+    <span class="fab-lbl">맨 위로</span>
+  </div>
+  <div class="fab-wrap">
+    <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="fab fab-kakao">💬</a>
+    <span class="fab-lbl">카카오 채팅 상담</span>
+  </div>
+  <div class="fab-wrap">
+    <a href="tel:0328876293" class="fab fab-call">📞</a>
+    <span class="fab-lbl">032-887-6293</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header id="mainHeader">
+  <div class="nav-inner">
+    <a href="#top" class="logo-wrap">
+      <div class="logo-icon">D</div>
+      <div>
+        <div class="logo-text">대신인력</div>
+        <div class="logo-sub">Daesin Electric Work</div>
+      </div>
+    </a>
+    <nav class="gnb">
       <a href="#service">업무소개</a>
-      <a href="#recruit">구직</a>
+      <a href="#why">선택이유</a>
+      <a href="#recruit">구직문의</a>
       <a href="#partner">협업문의</a>
-      <a class="nav-call" href="tel:0328876293">전화 032-887-6293</a>
     </nav>
+    <div class="header-cta">
+      <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="btn-kakao-hd">💬 카카오 채널</a>
+      <a href="tel:0328876293" class="btn-call-hd">📞 032-887-6293</a>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<main id="top">
-  <section class="section hero">
-    <div class="inner hero-grid">
-      <div>
-        <h1 class="hero-title">
-          <strong>전기 전문 인력</strong><br>전국 어디든 즉시 투입
-        </h1>
-        <p class="hero-text">
-          배선 · 배관 · 트레이 · 조명 · 동력 · 통신 등 전기공사 전 분야 숙련 인력 공급.<br>
-          인천·수도권 중심, 전국 협력사 네트워크로 빠르게 인력 투입합니다.
-        </p>
-        <div class="hero-actions">
-          <a href="tel:0328876293" class="btn btn-call">📞 바로 전화하기</a>
-          <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="btn btn-kakao-link">
-            💬 카카오 채널 추가
-          </a>
-          <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="btn btn-kakao-link">
-            🗨️ 카카오 채팅 상담
-          </a>
-        </div>
-        <p style="font-size:12px;color:#cbd5e1;">
-          * 급한 건은 전화가 가장 빠릅니다.
-        </p>
-      </div>
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#service" onclick="closeMenu()">업무소개</a>
+  <a href="#why" onclick="closeMenu()">선택이유</a>
+  <a href="#recruit" onclick="closeMenu()">구직문의</a>
+  <a href="#partner" onclick="closeMenu()">협업문의</a>
+  <div class="mobile-ctas">
+    <a href="tel:0328876293" class="mc-call">📞 032-887-6293</a>
+    <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="mc-k1">💬 채널 추가</a>
+    <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="mc-k2">🗨️ 채팅 상담</a>
+  </div>
+</div>
 
-      <div class="hero-card">
-        <div class="hero-row">
-          <div class="hero-label">대표번호</div>
-          <div class="hero-value"><a href="tel:0328876293">032-887-6293</a></div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">카카오톡 ID</div>
-          <div class="hero-value">daesin8253</div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">이메일</div>
-          <div class="hero-value">
-            <a href="mailto:daesin8253@gmail.com">daesin8253@gmail.com</a>
-          </div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">주소</div>
-          <div class="hero-value">인천광역시 미추홀구 경인로 1, 3층 301호</div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">사업자등록번호</div>
-          <div class="hero-value">104-92-03100</div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">직업소개사업 등록번호</div>
-          <div class="hero-value">제2025-3510578-14-5-00005호</div>
-        </div>
-        <div class="hero-row">
-          <div class="hero-label">카카오톡 QR</div>
-          <img src="./kakao_qr.jpg" alt="카카오톡 QR" class="qr">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="service" class="section">
-    <div class="inner">
-      <h2 class="title">업무 소개</h2>
-      <p class="sub">전기 인력이 주력이며, 건설·인테리어·철거·청소 인력은 서브로 지원합니다.</p>
-
-      <div class="two-grid">
-        <div class="panel">
-          <h3>전기 전문 인력</h3>
-          <ul>
-            <li>배선 · 배관 · 트레이 · 조명 · 동력 · 통신</li>
-            <li>현장 소장님과 직접 소통 가능한 A급 기술자</li>
-            <li>장·단기 파견, 야간·주말 인력 지원</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3>건설 · 인테리어 · 철거 · 청소</h3>
-          <ul>
-            <li>공사 보조, 자재 운반, 마감 정리 인력</li>
-            <li>소규모 철거 및 공사 후 청소</li>
-            <li>협력업체와 장기 파트너십 가능</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="recruit">
-    <div class="inner">
-      <h2 class="title">전기 인력 구직 문의</h2>
-      <p class="sub">
-        간단히 작성해 주시면 담당자가 확인 후 바로 전화드립니다.
+<!-- ── HERO ── -->
+<section class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-gradient"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><span class="dot"></span>인천·수도권 중심 전국 네트워크</div>
+      <h1 class="hero-title">
+        <span class="accent">전기 전문</span><br>
+        숙련 인력을<br>즉시 공급합니다
+      </h1>
+      <p class="hero-desc">
+        배선·배관·트레이·조명·동력·통신 등 전기공사 전 분야<br>
+        A급 숙련 기술자를 현장에 빠르게 투입합니다.<br>
+        장·단기 파견, 야간·주말 긴급 인력도 지원 가능합니다.
       </p>
+      <div class="hero-actions">
+        <a href="tel:0328876293" class="btn-green">📞 지금 바로 전화하기</a>
+        <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="btn-kakao">💬 카카오 채널 추가</a>
+        <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="btn-kakao btn-kakao2">🗨️ 카카오 채팅 상담</a>
+        <a href="#recruit" class="btn-outline">구직 지원하기 →</a>
+      </div>
+      <p class="hero-hint">* 급한 건은 전화가 가장 빠릅니다.</p>
+      <div class="hero-stats">
+        <div>
+          <div class="hs-num">전국<span>망</span></div>
+          <div class="hs-label">협력사 네트워크</div>
+        </div>
+        <div>
+          <div class="hs-num">즉시<span>↗</span></div>
+          <div class="hs-label">현장 투입 가능</div>
+        </div>
+        <div>
+          <div class="hs-num">24<span>시</span></div>
+          <div class="hs-label">긴급 대응</div>
+        </div>
+      </div>
+    </div>
 
-      <div class="panel">
-        <form id="recruitForm">
-          <div class="form-grid">
-            <div>
-              <label for="region">지역 (필수)</label>
-              <input id="region" name="region" placeholder="예) 인천, 부천, 김포 등" required>
-            </div>
-            <div>
-              <label for="age">나이 (필수)</label>
-              <input id="age" name="age" placeholder="예) 45세" required>
-            </div>
-            <div>
-              <label for="career">전기공 경력 (필수)</label>
-              <input id="career" name="career" placeholder="예) 경력 10년, 초보, 조공 등" required>
-            </div>
-            <div>
-              <label for="specialty">주특기</label>
-              <input id="specialty" name="specialty" placeholder="예) 배관, 트레이, 동력, 통신 등">
-            </div>
-            <div>
-              <label for="car_own">자차 여부</label>
-              <select id="car_own" name="car_own">
-                <option value="">선택하세요</option>
-                <option value="있음">있음</option>
-                <option value="없음">없음</option>
-              </select>
-            </div>
-            <div>
-              <label for="phone">연락처 (필수)</label>
-              <input id="phone" name="phone" placeholder="예) 010-0000-0000" type="tel" required>
-            </div>
-            <div class="form-row-full">
-              <label for="memo">기타 메모</label>
-              <textarea id="memo" name="memo" placeholder="희망 단가, 가능 지역, 근무 가능 요일 등 자유롭게 적어주세요."></textarea>
-            </div>
+    <!-- Info Card -->
+    <div class="hero-card">
+      <div class="card-hdr">
+        <div style="font-size:18px;">🏢</div>
+        <div>
+          <div class="card-hdr-title">대신인력</div>
+          <div class="card-hdr-sub">전기 전문 인력사무소</div>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="info-ic">📞</div>
+        <div><div class="info-lbl">대표번호</div><div class="info-val"><a href="tel:0328876293">032-887-6293</a></div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-ic">✉️</div>
+        <div><div class="info-lbl">이메일</div><div class="info-val"><a href="mailto:daesin8253@gmail.com">daesin8253@gmail.com</a></div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-ic">📍</div>
+        <div><div class="info-lbl">주소</div><div class="info-val">인천광역시 미추홀구 경인로 1, 3층 301호</div></div>
+      </div>
+      <div class="lic-box">
+        <div class="lic-row"><span class="lic-k">사업자등록번호</span><span class="lic-v">104-92-03100</span></div>
+        <div class="lic-row"><span class="lic-k">직업소개 등록번호</span><span class="lic-v">제2025-3510578-14-5-00005호</span></div>
+      </div>
+      <div class="kakao-btns">
+        <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="kbtn">💬 채널 추가</a>
+        <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="kbtn">🗨️ 채팅 상담</a>
+      </div>
+      <div class="qr-sec">
+        <div class="qr-img">
+          <img src="./kakao_qr.jpg" alt="카카오톡 QR" onerror="this.parentElement.innerHTML='<span style=font-size:24px>💬</span>'">
+        </div>
+        <div>
+          <div class="qr-desc" style="color:rgba(255,255,255,.4);font-size:10px;margin-bottom:2px;">카카오톡 ID</div>
+          <div class="qr-id">daesin8253</div>
+          <div class="qr-desc">QR 스캔 또는 ID 친구추가</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-section">
+  <div class="stats-bg"></div>
+  <div class="inner">
+    <div class="stats-grid fade-up">
+      <div class="stat-item">
+        <div class="stat-num">전문<span class="unit">성</span></div>
+        <div class="stat-label">전기공사 전 분야 공급</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">전국<span class="unit">망</span></div>
+        <div class="stat-label">협력사 네트워크 구축</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">즉시<span class="unit">↗</span></div>
+        <div class="stat-label">연락 즉시 현장 투입</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24<span class="unit">시</span></div>
+        <div class="stat-label">야간·주말 긴급 대응</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SERVICES ── -->
+<section class="section section-alt" id="service">
+  <div class="inner">
+    <div class="fade-up">
+      <span class="eyebrow">Our Services</span>
+      <h2 class="s-title">전문 인력 공급 서비스</h2>
+      <p class="s-desc">전기공사가 주력이며, 건설·인테리어·철거·청소 인력은 서브로 지원합니다.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card feat fade-up">
+        <div class="svc-icon">⚡</div>
+        <div class="svc-title">전기 전문 인력 (주력)</div>
+        <p class="svc-text">전기공사 전 분야에 걸쳐 숙련된 A급 기술자를 공급합니다. 현장 소장님과 직접 소통이 가능하며 즉각적인 투입이 가능한 숙련 인력 네트워크를 보유하고 있습니다.</p>
+        <div class="feat-grid">
+          <div class="feat-col">
+            <h4>⚡ 공사 분야</h4>
+            <ul>
+              <li>배선 · 배관</li>
+              <li>케이블 트레이</li>
+              <li>조명 · 동력</li>
+              <li>통신 · 약전</li>
+              <li>특고압 · 수변전</li>
+            </ul>
           </div>
+          <div class="feat-col">
+            <h4>🔧 투입 형태</h4>
+            <ul>
+              <li>단기 일용 파견</li>
+              <li>장기 상주 파견</li>
+              <li>야간 긴급 투입</li>
+              <li>주말 · 공휴일</li>
+              <li>대규모 프로젝트</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="svc-card fade-up">
+        <div class="svc-icon">🏗️</div>
+        <div class="svc-title">건설 · 인테리어</div>
+        <p class="svc-text">공사 보조 및 자재 운반, 마감 정리 인력을 공급합니다. 협력업체와의 장기 파트너십도 가능합니다.</p>
+        <div class="svc-tags">
+          <span class="svc-tag">공사 보조</span><span class="svc-tag">자재 운반</span>
+          <span class="svc-tag">마감 정리</span><span class="svc-tag">장기 파트너</span>
+        </div>
+      </div>
+      <div class="svc-card fade-up">
+        <div class="svc-icon">🔨</div>
+        <div class="svc-title">철거 · 청소</div>
+        <p class="svc-text">소규모 철거 및 공사 후 청소 인력을 지원합니다. 빠른 현장 마무리를 도와드립니다.</p>
+        <div class="svc-tags">
+          <span class="svc-tag">소규모 철거</span><span class="svc-tag">공사 후 청소</span><span class="svc-tag">현장 정리</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-          <button type="submit" class="btn-full" id="recruitSubmit">지원서 보내기</button>
+<!-- ── WHY US ── -->
+<section class="section" id="why">
+  <div class="inner">
+    <div class="fade-up">
+      <span class="eyebrow">Why Choose Us</span>
+      <h2 class="s-title">대신인력을 선택하는 이유</h2>
+      <p class="s-desc">정직하고 빠른 대응으로 현장에서 신뢰를 쌓아가고 있습니다.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card fade-up"><div class="why-num">01</div><div class="why-title">즉시 투입 가능한 숙련 인력</div><p class="why-text">검증된 숙련 기술자 풀을 보유하여 연락 즉시 현장 투입이 가능합니다. 급한 상황에도 빠르게 대응합니다.</p></div>
+      <div class="why-card fade-up"><div class="why-num">02</div><div class="why-title">인천·수도권 전국 네트워크</div><p class="why-text">인천·수도권을 중심으로 전국 협력사 네트워크를 통해 어느 지역이든 빠르게 인력을 공급할 수 있습니다.</p></div>
+      <div class="why-card fade-up"><div class="why-num">03</div><div class="why-title">전기공사 전 분야 전문</div><p class="why-text">배선·배관·트레이부터 특고압·수변전까지 전기공사 전 분야에 걸쳐 적합한 기술자를 매칭합니다.</p></div>
+      <div class="why-card fade-up"><div class="why-num">04</div><div class="why-title">합법적 직업소개 등록 사업체</div><p class="why-text">직업소개사업 정식 등록 업체로 모든 인력 소개가 합법적으로 진행됩니다. 안심하고 거래하실 수 있습니다.</p></div>
+      <div class="why-card fade-up"><div class="why-num">05</div><div class="why-title">대표가 직접 운영하는 신속 소통</div><p class="why-text">대표가 직접 운영하여 소통이 빠르고 유연합니다. 전화·카카오톡으로 즉시 상담 가능하며 현장 상황에 맞춰 대응합니다.</p></div>
+      <div class="why-card fade-up"><div class="why-num">06</div><div class="why-title">야간·주말 긴급 대응</div><p class="why-text">긴급 상황에도 야간·주말 인력 투입이 가능합니다. 현장의 촉박한 일정에도 최대한 맞춰 드립니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section class="section section-alt">
+  <div class="inner">
+    <div class="fade-up" style="text-align:center;">
+      <span class="eyebrow">How It Works</span>
+      <h2 class="s-title">간단한 인력 요청 절차</h2>
+      <p class="s-desc" style="margin:0 auto;">4단계만으로 원하는 인력을 현장에 투입할 수 있습니다.</p>
+    </div>
+    <div class="proc-steps fade-up">
+      <div class="proc-step"><div class="step-n">1</div><div class="step-title">연락 &amp; 상담</div><p class="step-desc">전화 또는 카카오톡으로 필요 인력과 현장 상황을 알려주세요</p></div>
+      <div class="proc-step"><div class="step-n">2</div><div class="step-title">인력 매칭</div><p class="step-desc">현장에 적합한 숙련 기술자를 즉시 매칭합니다</p></div>
+      <div class="proc-step"><div class="step-n">3</div><div class="step-title">조건 확인</div><p class="step-desc">투입 일정, 단가, 인원 등 세부 조건을 조율합니다</p></div>
+      <div class="proc-step"><div class="step-n">4</div><div class="step-title">현장 투입</div><p class="step-desc">확정 즉시 기술자를 현장에 파견합니다</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FORMS ── -->
+<section class="forms-section" id="recruit">
+  <div class="forms-inner">
+    <div class="fade-up" style="text-align:center;">
+      <span class="eyebrow">Apply &amp; Inquire</span>
+      <h2 class="s-title">구직 문의 &amp; 협업 문의</h2>
+      <p class="s-desc" style="margin:0 auto;">작성해 주시면 담당자가 직접 전화드립니다.</p>
+    </div>
+    <div class="forms-grid">
+
+      <!-- RECRUIT -->
+      <div class="fp fade-up">
+        <div class="fp-icon">👷</div>
+        <div class="fp-title">전기 인력 구직 문의</div>
+        <p class="fp-desc">전기공 경력이 있으신 분은 아래 내용을 작성해 주세요. 담당자가 확인 후 연락드립니다.</p>
+        <form id="recruitForm">
+          <div class="fg">
+            <div class="fg-grp"><label>지역 (필수)</label><input id="region" name="region" placeholder="예) 인천, 부천, 김포 등" required></div>
+            <div class="fg-grp"><label>나이 (필수)</label><input id="age" name="age" placeholder="예) 45세" required></div>
+            <div class="fg-grp"><label>전기공 경력 (필수)</label><input id="career" name="career" placeholder="예) 경력 10년, 초보, 조공 등" required></div>
+            <div class="fg-grp"><label>주특기</label><input id="specialty" name="specialty" placeholder="예) 배관, 트레이, 동력, 통신 등"></div>
+            <div class="fg-grp"><label>자차 여부</label><select id="car_own" name="car_own"><option value="">선택하세요</option><option value="있음">있음</option><option value="없음">없음</option></select></div>
+            <div class="fg-grp"><label>연락처 (필수)</label><input id="phone" name="phone" placeholder="예) 010-0000-0000" type="tel" required></div>
+            <div class="fg-grp ff"><label>기타 메모</label><textarea id="memo" name="memo" placeholder="희망 단가, 가능 지역, 근무 가능 요일 등 자유롭게 적어주세요."></textarea></div>
+          </div>
+          <button type="submit" class="btn-sub btn-sub-green" id="recruitSubmit">지원서 보내기 →</button>
           <div id="recruitStatus" class="status-msg"></div>
-
-          <p class="notice">
-            ※ 서류 제출 안내<br>
-            지원서 확인 후 담당자가 개별 연락드리며,<br>
-            신분증 · 건설기초안전교육 이수증 · 통장사본 등은
-            본인 확인 절차 후 별도로 안내드립니다.<br>
-            홈페이지에서는 어떠한 민감정보도 수집하지 않습니다.
-          </p>
+          <div class="f-notice">※ 지원서 확인 후 담당자가 개별 연락드리며, 신분증·건설기초안전교육 이수증·통장사본 등은 본인 확인 절차 후 별도로 안내드립니다. 홈페이지에서는 어떠한 민감정보도 수집하지 않습니다.</div>
         </form>
       </div>
-    </div>
-  </section>
 
-  <section class="section" id="partner">
-    <div class="inner">
-      <h2 class="title">협업 · 제휴 문의</h2>
-      <p class="sub">
-        전기공사 도급·하도급, 장기 파견, 대규모 프로젝트 협업은 아래 내용을 남겨 주시면
-        담당자가 직접 전화드립니다.
-      </p>
-
-      <div class="panel">
+      <!-- PARTNER -->
+      <div class="fp fade-up" id="partner">
+        <div class="fp-icon">🤝</div>
+        <div class="fp-title">협업 · 제휴 문의</div>
+        <p class="fp-desc">전기공사 도급·하도급, 장기 파견, 대규모 프로젝트 협업은 아래 내용을 남겨 주세요.</p>
         <form id="partnerForm">
-          <div class="form-grid">
-            <div>
-              <label for="p_type">협업 분야 (필수)</label>
-              <select id="p_type" name="type" required>
-                <option value="">선택하세요</option>
-                <option value="전기공사">전기공사</option>
-                <option value="장기파견">장기 파견</option>
-                <option value="철거·인테리어">철거·인테리어</option>
-                <option value="청소·기타">청소 / 기타</option>
-              </select>
-            </div>
-            <div>
-              <label for="p_company">회사명</label>
-              <input id="p_company" name="company" placeholder="예) ㈜○○전기">
-            </div>
-            <div>
-              <label for="p_manager">담당자명 (필수)</label>
-              <input id="p_manager" name="manager" placeholder="예) 홍길동 소장" required>
-            </div>
-            <div>
-              <label for="p_phone">연락처 (필수)</label>
-              <input id="p_phone" name="phone" placeholder="예) 010-0000-0000" type="tel" required>
-            </div>
-            <div>
-              <label for="p_email">이메일</label>
-              <input id="p_email" name="email" placeholder="필수는 아니지만 있으면 좋습니다." type="email">
-            </div>
-            <div>
-              <label for="p_schedule">희망 일정</label>
-              <input id="p_schedule" name="schedule" placeholder="예) 3월 둘째주부터 2개월 등">
-            </div>
-            <div class="form-row-full">
-              <label for="p_message">상세 내용 (필수)</label>
-              <textarea id="p_message" name="message" placeholder="현장 위치, 공사 규모, 필요 인원/기간 등을 적어 주세요." required></textarea>
-            </div>
+          <div class="fg">
+            <div class="fg-grp"><label>협업 분야 (필수)</label><select id="p_type" name="type" required><option value="">선택하세요</option><option value="전기공사">전기공사</option><option value="장기파견">장기 파견</option><option value="철거·인테리어">철거·인테리어</option><option value="청소·기타">청소 / 기타</option></select></div>
+            <div class="fg-grp"><label>회사명</label><input id="p_company" name="company" placeholder="예) ㈜○○전기"></div>
+            <div class="fg-grp"><label>담당자명 (필수)</label><input id="p_manager" name="manager" placeholder="예) 홍길동 소장" required></div>
+            <div class="fg-grp"><label>연락처 (필수)</label><input id="p_phone" name="phone" placeholder="예) 010-0000-0000" type="tel" required></div>
+            <div class="fg-grp"><label>이메일</label><input id="p_email" name="email" placeholder="선택사항" type="email"></div>
+            <div class="fg-grp"><label>희망 일정</label><input id="p_schedule" name="schedule" placeholder="예) 3월 둘째주부터 2개월"></div>
+            <div class="fg-grp ff"><label>상세 내용 (필수)</label><textarea id="p_message" name="message" placeholder="현장 위치, 공사 규모, 필요 인원/기간 등을 적어 주세요." required></textarea></div>
           </div>
-
-          <button type="submit" class="btn-full" id="partnerSubmit">협업 문의 보내기</button>
+          <button type="submit" class="btn-sub btn-sub-blue" id="partnerSubmit">협업 문의 보내기 →</button>
           <div id="partnerStatus" class="status-msg"></div>
         </form>
       </div>
     </div>
-  </section>
-</main>
+  </div>
+</section>
 
+<!-- ── CTA ── -->
+<section class="cta-sec">
+  <div class="cta-bg"></div>
+  <div class="cta-in fade-up">
+    <h2 class="cta-title">급한 인력이 필요하신가요?<br>지금 바로 연락주세요</h2>
+    <p class="cta-desc">전화가 가장 빠릅니다. 현장 상황을 말씀해 주시면 즉시 매칭해 드립니다.</p>
+    <div class="cta-acts">
+      <a href="tel:0328876293" class="btn-green" style="font-size:16px;padding:14px 30px;">📞 032-887-6293 전화하기</a>
+      <a href="http://pf.kakao.com/_AxbPxhX" target="_blank" class="btn-kakao" style="font-size:16px;padding:14px 26px;">💬 카카오 채널 추가</a>
+      <a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank" class="btn-kakao btn-kakao2" style="font-size:16px;padding:14px 26px;">🗨️ 카카오 채팅 상담</a>
+    </div>
+    <div class="cta-contacts">
+      <div><div class="cc-label">이메일</div><div class="cc-value"><a href="mailto:daesin8253@gmail.com">daesin8253@gmail.com</a></div></div>
+      <div><div class="cc-label">주소</div><div class="cc-value">인천광역시 미추홀구 경인로 1, 3층 301호</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
 <footer>
-  © 대신전기인력. All Rights Reserved.
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="logo-wrap" style="margin-bottom:2px;">
+          <div class="logo-icon" style="width:30px;height:30px;font-size:14px;">D</div>
+          <div class="logo-text" style="color:rgba(255,255,255,.75);">대신인력</div>
+        </div>
+        <p class="f-brand-desc">인천·수도권 중심, 전국 협력사 네트워크를 통해<br>전기공사 전 분야 숙련 인력을 신속하게 공급합니다.<br><br>인천광역시 미추홀구 경인로 1, 3층 301호</p>
+      </div>
+      <div class="f-col">
+        <h4>Quick Menu</h4>
+        <ul>
+          <li><a href="#service">업무소개</a></li>
+          <li><a href="#why">선택이유</a></li>
+          <li><a href="#recruit">구직 문의</a></li>
+          <li><a href="#partner">협업 문의</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:0328876293">📞 032-887-6293</a></li>
+          <li><a href="mailto:daesin8253@gmail.com">✉️ daesin8253@gmail.com</a></li>
+          <li><a href="http://pf.kakao.com/_AxbPxhX" target="_blank">💬 카카오 채널 추가</a></li>
+          <li><a href="http://pf.kakao.com/_AxbPxhX/chat" target="_blank">🗨️ 카카오 채팅 상담</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="f-divider">
+    <div class="f-bottom">
+      <div class="f-copy">© 2025 대신인력. All Rights Reserved.</div>
+      <div class="f-reg">사업자등록번호: 104-92-03100 &nbsp;|&nbsp; 직업소개사업 등록번호: 제2025-3510578-14-5-00005호</div>
+    </div>
+  </div>
 </footer>
 
 <script>
-/* EmailJS 폼 전송 스크립트는 이전과 100% 동일하게 정상 작동합니다 */
+const SUPABASE_URL      = "https://xovvbkcngfcndkhxwyqd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_O_RB3eRmGYDRZfwIfbWoCQ_izEVlw6J";
 const EMAILJS_PUBLIC_KEY  = "Dg6kq6qcxRykF-dpn";
-const EMAILJS_SERVICE_ID  = "daesin-work";  
-const EMAILJS_TEMPLATE_ID = "daesin-work";  
+const EMAILJS_SERVICE_ID  = "daesin-work";
+const EMAILJS_TEMPLATE_ID = "daesin-work";
 
-if (typeof emailjs === "undefined") {
-  alert("EmailJS 라이브러리가 로딩되지 않았습니다. 인터넷 연결을 확인하세요.");
-} else {
-  emailjs.init(EMAILJS_PUBLIC_KEY);
-}
+let sb;
+try { sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) {}
+try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
 
-function setButtonState(button, text, disabled) {
-  button.textContent = text;
-  button.disabled = disabled;
-  button.style.opacity = disabled ? 0.6 : 1;
-}
+/* Scroll effects */
+const header = document.getElementById('mainHeader');
+const fCta   = document.getElementById('floatingCta');
+const pBar   = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+  const s = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
+  pBar.style.width = ((s/h)*100) + '%';
+  header.classList.toggle('scrolled', s > 60);
+  fCta.classList.toggle('visible', s > 60);
+});
 
-function v(x) {
-  return (x ?? "").toString().trim();
-}
+/* Fade in */
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e,i) => {
+    if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), 100*(i%4)); obs.unobserve(e.target); }
+  });
+}, { threshold:.1, rootMargin:'0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 
-async function sendMail({ title, name, message }) {
-  return emailjs.send(
-    EMAILJS_SERVICE_ID,
-    EMAILJS_TEMPLATE_ID,
-    { title: title, name: name, message: message }
-  );
-}
+/* Mobile menu */
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('hamburger').classList.toggle('open');}
+function closeMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('hamburger').classList.remove('open');}
 
+/* Smooth scroll */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e){
+    const t = document.querySelector(this.getAttribute('href'));
+    if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-80,behavior:'smooth'});closeMenu();}
+  });
+});
+
+/* Utils */
+function v(x){return(x??"").toString().trim();}
+function setBtn(btn,txt,dis){btn.textContent=txt;btn.disabled=dis;btn.style.opacity=dis?.6:1;}
+async function sendMail(p){return emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,p);}
+
+/* Recruit form */
 document.getElementById("recruitForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const btn = document.getElementById("recruitSubmit");
-  const statusEl = document.getElementById("recruitStatus");
-  setButtonState(btn, "지원서를 전송 중입니다...", true);
-  statusEl.textContent = "";
-
-  const f = e.target;
-  const payload = {
-    region: v(f.region.value), age: v(f.age.value), career: v(f.career.value),
-    specialty: v(f.specialty.value), car_own: v(f.car_own.value), phone: v(f.phone.value), memo: v(f.memo.value),
-  };
-
-  if (!payload.region || !payload.age || !payload.career || !payload.phone) {
-    statusEl.style.color = "#f97373";
-    statusEl.textContent = "필수 항목(*)을 모두 입력해 주세요.";
-    setButtonState(btn, "지원서 보내기", false);
-    return;
-  }
-
-  const mailTitle = "전기 인력 구직 문의";
-  const mailName  = `${payload.region} / ${payload.age}세 / ${payload.career}`;
-  const mailMsg = `✅ 전기 인력 구직 문의 접수\n\n지역: ${payload.region}\n나이: ${payload.age}\n전기공 경력: ${payload.career}\n주특기: ${payload.specialty}\n자차 여부: ${payload.car_own}\n연락처: ${payload.phone}\n기타 메모: ${payload.memo}\n`;
-
+  const btn=document.getElementById("recruitSubmit"), st=document.getElementById("recruitStatus");
+  setBtn(btn,"전송 중입니다...",true); st.textContent="";
+  const f=e.target;
+  const p={region:v(f.region.value),age:v(f.age.value),career:v(f.career.value),specialty:v(f.specialty.value),car_own:v(f.car_own.value),phone:v(f.phone.value),memo:v(f.memo.value)};
+  if(!p.region||!p.age||!p.career||!p.phone){st.className="status-msg s-err";st.textContent="필수 항목을 모두 입력해 주세요.";setBtn(btn,"지원서 보내기 →",false);return;}
   try {
-    await sendMail({ title: mailTitle, name: mailName, message: mailMsg });
-    statusEl.style.color = "#4ade80";
-    statusEl.textContent = "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
-    f.reset();
-  } catch (err) {
-    statusEl.style.color = "#f97373";
-    statusEl.textContent = "지원서 전송 중 오류가 발생했습니다. 다시 시도해 주세요.";
-  } finally {
-    setButtonState(btn, "지원서 보내기", false);
-  }
+    if(sb){const{error}=await sb.from("recruit_applications").insert([p]);if(error)console.error(error);}
+    const msg=`✅ 전기 인력 구직 문의\n\n지역: ${p.region}\n나이: ${p.age}\n경력: ${p.career}\n주특기: ${p.specialty}\n자차: ${p.car_own}\n연락처: ${p.phone}\n메모: ${p.memo}`;
+    await sendMail({title:"전기 인력 구직 문의",name:`${p.region} / ${p.career}`,message:msg});
+    st.className="status-msg s-ok"; st.textContent="✅ 정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다."; f.reset();
+  } catch(err){console.error(err);st.className="status-msg s-err";st.textContent="⚠️ 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";}
+  finally{setBtn(btn,"지원서 보내기 →",false);}
 });
 
+/* Partner form */
 document.getElementById("partnerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const btn = document.getElementById("partnerSubmit");
-  const statusEl = document.getElementById("partnerStatus");
-  setButtonState(btn, "문의를 전송 중입니다...", true);
-  statusEl.textContent = "";
-
-  const f = e.target;
-  const payload = {
-    type: v(f.type.value), company: v(f.company.value), manager: v(f.manager.value),
-    phone: v(f.phone.value), email: v(f.email.value), schedule: v(f.schedule.value), message: v(f.message.value),
-  };
-
-  if (!payload.type || !payload.manager || !payload.phone || !payload.message) {
-    statusEl.style.color = "#f97373";
-    statusEl.textContent = "필수 항목(*)을 모두 입력해 주세요.";
-    setButtonState(btn, "협업 문의 보내기", false);
-    return;
-  }
-
-  const mailTitle = "협업 · 제휴 문의";
-  const mailName  = `${payload.company || "무명"} / ${payload.manager}`;
-  const mailMsg = `✅ 협업 · 제휴 문의 접수\n\n협업 분야: ${payload.type}\n회사명: ${payload.company}\n담당자: ${payload.manager}\n연락처: ${payload.phone}\n이메일: ${payload.email}\n희망 일정: ${payload.schedule}\n\n상세 내용:\n${payload.message}\n`;
-
+  const btn=document.getElementById("partnerSubmit"), st=document.getElementById("partnerStatus");
+  setBtn(btn,"전송 중입니다...",true); st.textContent="";
+  const f=e.target;
+  const p={type:v(f.type.value),company:v(f.company.value),manager:v(f.manager.value),phone:v(f.phone.value),email:v(f.email.value),schedule:v(f.schedule.value),message:v(f.message.value)};
+  if(!p.type||!p.manager||!p.phone||!p.message){st.className="status-msg s-err";st.textContent="필수 항목을 모두 입력해 주세요.";setBtn(btn,"협업 문의 보내기 →",false);return;}
   try {
-    await sendMail({ title: mailTitle, name: mailName, message: mailMsg });
-    statusEl.style.color = "#4ade80";
-    statusEl.textContent = "정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다.";
-    f.reset();
-  } catch (err) {
-    statusEl.style.color = "#f97373";
-    statusEl.textContent = "문의 전송 중 오류가 발생했습니다. 다시 시도해 주세요.";
-  } finally {
-    setButtonState(btn, "협업 문의 보내기", false);
-  }
+    if(sb){const{error}=await sb.from("partner_inquiries").insert([p]);if(error)console.error(error);}
+    const msg=`✅ 협업·제휴 문의\n\n분야: ${p.type}\n회사: ${p.company}\n담당자: ${p.manager}\n연락처: ${p.phone}\n이메일: ${p.email}\n일정: ${p.schedule}\n\n${p.message}`;
+    await sendMail({title:"협업·제휴 문의",name:`${p.company||"미입력"} / ${p.manager}`,message:msg});
+    st.className="status-msg s-ok"; st.textContent="✅ 정상적으로 접수되었습니다. 담당자가 순차적으로 연락드립니다."; f.reset();
+  } catch(err){console.error(err);st.className="status-msg s-err";st.textContent="⚠️ 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";}
+  finally{setBtn(btn,"협업 문의 보내기 →",false);}
 });
 </script>
-
 </body>
 </html>
